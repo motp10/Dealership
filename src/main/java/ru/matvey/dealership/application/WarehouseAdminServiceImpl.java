@@ -1,6 +1,6 @@
 package ru.matvey.dealership.application;
 
-import ru.matvey.dealership.Abstraction.PersistanceRepository;
+import ru.matvey.dealership.abstraction.PersistanceRepository;
 import ru.matvey.dealership.contracts.Models.CarDto;
 import ru.matvey.dealership.contracts.Models.DetailDto;
 import ru.matvey.dealership.contracts.Operations.CarComplictation;
@@ -9,6 +9,7 @@ import ru.matvey.dealership.contracts.Services.WarehouseAdminService;
 import ru.matvey.dealership.domain.car.Car;
 import ru.matvey.dealership.domain.details.Body.Body;
 import ru.matvey.dealership.domain.details.Body.BodyType;
+import ru.matvey.dealership.domain.details.Cost;
 import ru.matvey.dealership.domain.details.DetailsFactory;
 import ru.matvey.dealership.domain.details.IDetail;
 import ru.matvey.dealership.domain.details.Transmission.Transmission;
@@ -63,7 +64,8 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
                 color,
                 fuel,
                 transmission,
-                driveLayout
+                driveLayout,
+                new Cost(100)
         );
         persistence.getCarRepository().addCar(car);
     }

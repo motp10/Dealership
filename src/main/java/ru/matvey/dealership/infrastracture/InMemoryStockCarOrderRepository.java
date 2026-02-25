@@ -1,10 +1,9 @@
 package ru.matvey.dealership.infrastracture;
 
-import ru.matvey.dealership.Abstraction.StockCarOrderRepository;
+import ru.matvey.dealership.abstraction.StockCarOrderRepository;
 import ru.matvey.dealership.domain.orders.stockCarOrder.OrderStockCar;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryStockCarOrderRepository implements StockCarOrderRepository {
     private final List<OrderStockCar> storage = new ArrayList<OrderStockCar>();

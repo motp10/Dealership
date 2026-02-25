@@ -1,6 +1,6 @@
 package ru.matvey.dealership.infrastracture;
 
-import ru.matvey.dealership.Abstraction.ManagersRepository;
+import ru.matvey.dealership.abstraction.ManagersRepository;
 import ru.matvey.dealership.domain.users.DealeshipManagerUser;
 
 import java.util.ArrayList;

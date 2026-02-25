@@ -1,18 +1,18 @@
 package org.example;
 
 import org.junit.jupiter.api.Test;
-import ru.matvey.dealership.Abstraction.PersistanceRepository;
+import ru.matvey.dealership.abstraction.PersistanceRepository;
 import ru.matvey.dealership.application.ClientServiceImpl;
 import ru.matvey.dealership.application.SystemAdminServiceImpl;
 import ru.matvey.dealership.contracts.Operations.CarComplictation;
 import ru.matvey.dealership.contracts.Operations.MakeOrder;
 import ru.matvey.dealership.contracts.Services.AdminService;
 import ru.matvey.dealership.contracts.Services.ClientService;
-import ru.matvey.dealership.domain.Exceptions.IncompatibleComponentException;
 import ru.matvey.dealership.domain.car.Car;
 import ru.matvey.dealership.domain.details.Body.Body;
 import ru.matvey.dealership.domain.details.Body.BodyType;
 import ru.matvey.dealership.domain.details.Cost;
+import ru.matvey.dealership.domain.details.IDetail;
 import ru.matvey.dealership.domain.details.Interior.Interior;
 import ru.matvey.dealership.domain.details.Interior.InteriorType;
 import ru.matvey.dealership.domain.details.SteeringWheel.SteeringWheel;
@@ -31,14 +31,12 @@ import ru.matvey.dealership.domain.users.ClientUser;
 import ru.matvey.dealership.domain.users.DealeshipManagerUser;
 import ru.matvey.dealership.infrastracture.*;
 
-import java.awt.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class AppTest {
     PersistanceRepository MakeGlobalRepository() {
@@ -98,6 +96,18 @@ class AppTest {
 
         return persistence;
     }
+
+    private PersistanceRepository createPersistence() {
+        return new PersistanceRepositoryImpl(
+                new InMemoryDetailsRepository(),
+                new InMemmoryManagersRepository(),
+                new InMemoryComplictationOrderRepository(),
+                new InMemoryCarRepository(),
+                new InMemoryStockCarOrderRepository(),
+                new InMemoryTestDriveRepository()
+        );
+    }
+
     @Test
     void AddCarTest() {
 
@@ -114,7 +124,8 @@ class AppTest {
                 new CarPaint(new PaintType("Green"), new Cost(123), ss),
                 new Fuel(new FuelType("Gasoline"), new Cost(123), ss),
                 new Transmission(new TransmissionType("Good transmission"), new Cost(123), ss),
-                new DriveLayout(new DriveLayoutType("AWD"), new Cost(123), ss)
+                new DriveLayout(new DriveLayoutType("AWD"), new Cost(123), ss),
+                new Cost(100)
         );
         CarComplictation complictation = new CarComplictation(
                 1000,
@@ -134,7 +145,8 @@ class AppTest {
                 new CarPaint(new PaintType("Green"), new Cost(123), ss),
                 new Fuel(new FuelType("Gasoline"), new Cost(123), ss),
                 new Transmission(new TransmissionType("Good transmission"), new Cost(123), ss),
-                new DriveLayout(new DriveLayoutType("AWD"), new Cost(123), ss)
+                new DriveLayout(new DriveLayoutType("AWD"), new Cost(123), ss),
+                new Cost(100)
         );
         persistence.getCarRepository().addCar(testCar);
         persistence.getCarRepository().addCar(testCar2);
@@ -165,7 +177,8 @@ class AppTest {
                 new CarPaint(new PaintType("Green"), new Cost(123), ss),
                 new Fuel(new FuelType("Gasoline"), new Cost(123), ss),
                 new Transmission(new TransmissionType("Good transmission"), new Cost(123), ss),
-                new DriveLayout(new DriveLayoutType("AWD"), new Cost(123), ss)
+                new DriveLayout(new DriveLayoutType("AWD"), new Cost(123), ss),
+                new Cost(100)
         );
         Car testCar2 = new Car(
                 "Mersedes",
@@ -174,7 +187,8 @@ class AppTest {
                 new CarPaint(new PaintType("Green"), new Cost(123), ss),
                 new Fuel(new FuelType("Gasoline"), new Cost(123), ss),
                 new Transmission(new TransmissionType("Good transmission"), new Cost(123), ss),
-                new DriveLayout(new DriveLayoutType("AWD"), new Cost(123), ss)
+                new DriveLayout(new DriveLayoutType("AWD"), new Cost(123), ss),
+                new Cost(100)
         );
         ClientUser clientUser = new ClientUser("SomeName", "1234", "FullName");
         MakeOrder.Request TestDrineRequest = new MakeOrder.Request(testCar.getId(), clientUser.GetId());
@@ -206,7 +220,8 @@ class AppTest {
                 new CarPaint(new PaintType("Green"), new Cost(123), ss),
                 new Fuel(new FuelType("Gasoline"), new Cost(123), ss),
                 new Transmission(new TransmissionType("Good transmission"), new Cost(123), ss),
-                new DriveLayout(new DriveLayoutType("AWD"), new Cost(123), ss)
+                new DriveLayout(new DriveLayoutType("AWD"), new Cost(123), ss),
+                new Cost(100)
         );
         Car testCar2 = new Car(
                 "Mersedes",
@@ -215,7 +230,8 @@ class AppTest {
                 new CarPaint(new PaintType("Green"), new Cost(123), ss),
                 new Fuel(new FuelType("Gasoline"), new Cost(123), ss),
                 new Transmission(new TransmissionType("Good transmission"), new Cost(123), ss),
-                new DriveLayout(new DriveLayoutType("AWD"), new Cost(123), ss)
+                new DriveLayout(new DriveLayoutType("AWD"), new Cost(123), ss),
+                new Cost(100)
         );
         ClientUser clientUser = new ClientUser("SomeName", "1234", "FullName");
         MakeOrder.Request order = new MakeOrder.Request(testCar.getId(), clientUser.GetId());
@@ -223,5 +239,123 @@ class AppTest {
         persistence.getCarRepository().addCar(testCar2);
         clientService.makeStockCarOrder(order);
         assertEquals(persistence.getStockCarOrderRepository().getAll().size(), 1);
+    }
+    @Test
+    void testAdminDeleteOperation() {
+        PersistanceRepository persistence = new PersistanceRepositoryImpl(
+                new InMemoryDetailsRepository(), new InMemmoryManagersRepository(),
+                new InMemoryComplictationOrderRepository(), new InMemoryCarRepository(),
+                new InMemoryStockCarOrderRepository(), new InMemoryTestDriveRepository()
+        );
+        AdminService adminService = new SystemAdminServiceImpl(persistence);
+
+        Set<String> ss = new HashSet<>();
+        Car car = new Car("Audi", "A4",
+                new Body(new BodyType("Sedan"), new Cost(5000), ss),
+                new CarPaint(new PaintType("White"), new Cost(100), ss),
+                new Fuel(new FuelType("Gas"), new Cost(0), ss),
+                new Transmission(new TransmissionType("Manual"), new Cost(1000), ss),
+                new DriveLayout(new DriveLayoutType("RWD"), new Cost(500), ss),
+                new Cost(100)
+        );
+
+        persistence.getCarRepository().addCar(car);
+        UUID carId = car.getId();
+
+        adminService.deleteCar(carId);
+
+
+        assertTrue(persistence.getCarRepository().getdAll().isEmpty(), "После удаления список должен быть пуст");
+    }
+
+    @Test
+    void testGetAllCars() {
+        // Setup
+        PersistanceRepository persistence = createPersistence();
+        ClientServiceImpl clientService = new ClientServiceImpl(persistence);
+
+        Set<String> models = new HashSet<>();
+        Car car = new Car("Audi", "A6",
+                new Body(new BodyType("Sedan"), new Cost(100), models),
+                new CarPaint(new PaintType("White"), new Cost(50), models),
+                new Fuel(new FuelType("Gas"), new Cost(0), models),
+                new Transmission(new TransmissionType("Auto"), new Cost(200), models),
+                new DriveLayout(new DriveLayoutType("AWD"), new Cost(150), models),
+                new Cost(100)
+        );
+
+        persistence.getCarRepository().addCar(car);
+
+        // Act
+        List<Car> cars = clientService.getAllCars();
+
+        // Assert
+        assertEquals(1, cars.size());
+        assertEquals("Audi", cars.get(0).getBrand());
+    }
+
+    @Test
+    void testMakeStockCarOrder() {
+        PersistanceRepository persistence = createPersistence();
+        ClientServiceImpl clientService = new ClientServiceImpl(persistence);
+
+        DealeshipManagerUser manager = new DealeshipManagerUser("m1", "p1", "Manager 1");
+        persistence.getManagerRepository().AddManager(manager);
+
+        UUID userId = UUID.randomUUID();
+        UUID carId = UUID.randomUUID();
+        MakeOrder.Request request = new MakeOrder.Request(carId, userId);
+
+        clientService.makeStockCarOrder(request);
+
+        assertEquals(1, persistence.getStockCarOrderRepository().getAll().size());
+    }
+
+    @Test
+    void testGetCarsByCriteria() {
+        // Setup
+        PersistanceRepository persistence = createPersistence();
+        ClientServiceImpl clientService = new ClientServiceImpl(persistence);
+
+        Set<String> ss = new HashSet<>();
+        Car car1 = new Car("BMW", "X5",
+                new Body(new BodyType("SUV"), new Cost(100), ss),
+                new CarPaint(new PaintType("Black"), new Cost(50), ss),
+                new Fuel(new FuelType("Diesel"), new Cost(0), ss),
+                new Transmission(new TransmissionType("Auto"), new Cost(200), ss),
+                new DriveLayout(new DriveLayoutType("AWD"), new Cost(150), ss),
+                new Cost(100)
+        );
+        persistence.getCarRepository().addCar(car1);
+
+        CarComplictation request = new CarComplictation(500000.0, "BMW", "X5", "SUV", "Diesel", "Auto", "AWD", "Black", "Alloy");
+
+        List<Car> result = clientService.getCars(request);
+
+        assertNotNull(result);
+    }
+    @Test
+    void testMakeTestDriveOrder() {
+        PersistanceRepository persistence = createPersistence();
+        ClientServiceImpl clientService = new ClientServiceImpl(persistence);
+        persistence.getManagerRepository().AddManager(new DealeshipManagerUser("m1", "p1", "Manager"));
+
+        MakeOrder.Request request = new MakeOrder.Request(UUID.randomUUID(), UUID.randomUUID());
+
+        clientService.makeTestDriveOrder(request);
+
+        assertEquals(1, persistence.getTestDriveRepository().getAll().size());
+    }
+    @Test
+    void testAddDetail_Success() {
+        IDetail newDetail = new Body(new BodyType("Coupe"), new Cost(300.0), Set.of("Sport"));
+        AdminService adminService = new SystemAdminServiceImpl(new PersistanceRepositoryImpl());
+        adminService.addDetail(newDetail);
+
+        List<IDetail> details = adminService.getAllDetails();
+        boolean found = details.stream()
+                .anyMatch(d -> d.Type().Value().equals("Coupe"));
+
+        assertTrue(found);
     }
 }

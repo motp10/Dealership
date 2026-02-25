@@ -1,6 +1,6 @@
 package ru.matvey.dealership.infrastracture;
 
-import ru.matvey.dealership.Abstraction.DetailsRepository;
+import ru.matvey.dealership.abstraction.DetailsRepository;
 import ru.matvey.dealership.domain.details.IDetail;
 import ru.matvey.dealership.domain.details.IDetailType;
 

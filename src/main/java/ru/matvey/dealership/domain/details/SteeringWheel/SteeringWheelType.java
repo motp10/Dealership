@@ -3,7 +3,6 @@ package ru.matvey.dealership.domain.details.SteeringWheel;
 import ru.matvey.dealership.domain.details.IDetailType;
 
 public record SteeringWheelType(String value) implements IDetailType {
-
     @Override
     public String Value() {
         return value;

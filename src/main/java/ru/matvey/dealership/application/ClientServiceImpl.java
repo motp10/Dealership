@@ -1,7 +1,6 @@
 package ru.matvey.dealership.application;
 
-import ru.matvey.dealership.Abstraction.PersistanceRepository;
-import ru.matvey.dealership.contracts.Models.CarDto;
+import ru.matvey.dealership.abstraction.PersistanceRepository;
 import ru.matvey.dealership.contracts.Operations.CarComplictation;
 import ru.matvey.dealership.contracts.Operations.MakeOrder;
 import ru.matvey.dealership.contracts.Services.ClientService;
@@ -22,7 +21,6 @@ import ru.matvey.dealership.domain.orders.configurationOrder.ConfigurationOrder;
 import ru.matvey.dealership.domain.orders.stockCarOrder.OrderStockCar;
 import ru.matvey.dealership.domain.orders.testDriveOrder.TestDriveOrder;
 
-import java.beans.ConstructorProperties;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,31 +34,35 @@ public class ClientServiceImpl implements ClientService {
     public List<Car> getAllCars() {
         return persistence.getCarRepository().getdAll();
     }
-
     @Override
     public void makeStockCarOrder(MakeOrder.Request request) {
-        UUID mangerId = persistence.getManagerRepository().getRandomManager();
-        persistence.getStockCarOrderRepository().addOrder(new OrderStockCar(request.userId(), request.carId(), mangerId));
+        UUID managerId = persistence.getManagerRepository().getRandomManager();
+        persistence.getStockCarOrderRepository().addOrder(new OrderStockCar(request.userId(), request.carId(), managerId));
     }
 
     @Override
     public void makeOrderWithComplictation(CarComplictation request, UUID clientId) {
         Body body = (Body) persistence.getDetailsRepository().getDetails(new BodyType(request.bodyType())).getFirst();
-        CarPaint carPaint = (CarPaint) persistence.getDetailsRepository().getDetails(new BodyType(request.color())).getFirst();
-        Fuel fuel = (Fuel) persistence.getDetailsRepository().getDetails(new BodyType(request.fuelType())).getFirst();
-        Transmission transmission = (Transmission) persistence.getDetailsRepository().getDetails(new BodyType(request.transmissionType())).getFirst();
-        DriveLayout drivelayout = (DriveLayout) persistence.getDetailsRepository().getDetails(new BodyType(request.drivelayoutType())).getFirst();
-        Car car = new Car(request.brand(),
-                          request.model(),
-                          body,
+        CarPaint carPaint = (CarPaint) persistence.getDetailsRepository().getDetails(new PaintType(request.color())).getFirst();
+        Fuel fuel = (Fuel) persistence.getDetailsRepository().getDetails(new FuelType(request.fuelType())).getFirst();
+        Transmission transmission = (Transmission) persistence.getDetailsRepository().getDetails(new TransmissionType(request.transmissionType())).getFirst();
+        DriveLayout drivelayout = (DriveLayout) persistence.getDetailsRepository().getDetails(new DriveLayoutType(request.drivelayoutType())).getFirst();
+
+        Car car = new Car(
+                request.brand(),
+                request.model(),
+                body,
                 carPaint,
-                          fuel,
-                          transmission,
-                          drivelayout);
+                fuel,
+                transmission,
+                drivelayout,
+                new Cost(100)
+        );
+
         UUID managerId = persistence.getManagerRepository().getRandomManager();
         ConfigurationOrder order = new ConfigurationOrder(clientId, car, managerId);
-        persistence.getComplictaionOrderRepository().add(order);
 
+        persistence.getComplictaionOrderRepository().add(order);
     }
 
     @Override

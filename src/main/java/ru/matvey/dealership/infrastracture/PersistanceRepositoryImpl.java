@@ -1,8 +1,7 @@
 package ru.matvey.dealership.infrastracture;
 
 import lombok.Getter;
-import ru.matvey.dealership.Abstraction.*;
-import ru.matvey.dealership.contracts.Operations.CarComplictation;
+import ru.matvey.dealership.abstraction.*;
 
 @Getter
 public class PersistanceRepositoryImpl implements PersistanceRepository {
@@ -24,6 +23,14 @@ public class PersistanceRepositoryImpl implements PersistanceRepository {
         this.detailsRepository = detailsRepository;
         this.testDriveRepository = testDriveRepository;
         this.stockCarOrderRepository = stockCarOrderRepository;
+    }
+    public PersistanceRepositoryImpl() {
+        this.carsRepository = new InMemoryCarRepository();
+        this.managersRepository = new InMemmoryManagersRepository();
+        this.complictaionOrderRepository = new InMemoryComplictationOrderRepository();
+        this.detailsRepository = new InMemoryDetailsRepository();
+        this.testDriveRepository = new InMemoryTestDriveRepository();
+        this.stockCarOrderRepository = new InMemoryStockCarOrderRepository();
     }
 
     @Override

@@ -1,4 +1,4 @@
-package ru.matvey.dealership.Abstraction;
+package ru.matvey.dealership.abstraction;
 
 import ru.matvey.dealership.domain.details.IDetail;
 import ru.matvey.dealership.domain.details.IDetailType;

@@ -1,10 +1,8 @@
 package org.example;
 
-import ru.matvey.dealership.Abstraction.PersistanceRepository;
+import ru.matvey.dealership.abstraction.PersistanceRepository;
 import ru.matvey.dealership.application.ClientServiceImpl;
-import ru.matvey.dealership.contracts.Models.CarDto;
 import ru.matvey.dealership.contracts.Operations.CarComplictation;
-import ru.matvey.dealership.contracts.Operations.MakeOrder;
 import ru.matvey.dealership.contracts.Services.ClientService;
 import ru.matvey.dealership.domain.car.Car;
 import ru.matvey.dealership.domain.details.Body.Body;
@@ -20,7 +18,6 @@ import ru.matvey.dealership.domain.details.fuel.Fuel;
 import ru.matvey.dealership.domain.details.fuel.FuelType;
 import ru.matvey.dealership.infrastracture.*;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -46,7 +43,8 @@ public final class App {
                 new CarPaint(new PaintType("Green"), new Cost(123), ss),
                 new Fuel(new FuelType("Gasoline"), new Cost(123), ss),
                 new Transmission(new TransmissionType("Good transmission"), new Cost(123), ss),
-                new DriveLayout(new DriveLayoutType("AWD"), new Cost(123), ss)
+                new DriveLayout(new DriveLayoutType("AWD"), new Cost(123), ss),
+                new Cost(100)
         );
         persistence.getCarRepository().addCar(testCar);
 

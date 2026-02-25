@@ -1,6 +1,6 @@
 package ru.matvey.dealership.infrastracture;
 
-import ru.matvey.dealership.Abstraction.CarsRepository;
+import ru.matvey.dealership.abstraction.CarsRepository;
 import ru.matvey.dealership.domain.car.Car;
 import ru.matvey.dealership.domain.details.Body.BodyType;
 import ru.matvey.dealership.domain.details.Cost;
@@ -58,4 +58,5 @@ public class InMemoryCarRepository implements CarsRepository {
                 .filter(car -> color == null || color.equals(car.getCarPaint().Type()))
                 .toList();
     }
+
 }

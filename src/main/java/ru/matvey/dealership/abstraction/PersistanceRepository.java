@@ -1,6 +1,4 @@
-package ru.matvey.dealership.Abstraction;
-
-import ru.matvey.dealership.contracts.Models.DetailDto;
+package ru.matvey.dealership.abstraction;
 
 public interface PersistanceRepository {
     CarsRepository getCarRepository();

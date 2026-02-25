@@ -1,9 +1,8 @@
-package ru.matvey.dealership.Abstraction;
+package ru.matvey.dealership.abstraction;
 
 import ru.matvey.dealership.domain.orders.stockCarOrder.OrderStockCar;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface StockCarOrderRepository{

@@ -1,9 +1,7 @@
 package ru.matvey.dealership.application;
 
-import ru.matvey.dealership.Abstraction.PersistanceRepository;
-import ru.matvey.dealership.contracts.Models.CarDto;
+import ru.matvey.dealership.abstraction.PersistanceRepository;
 import ru.matvey.dealership.contracts.Models.ConfigurationOrderDto;
-import ru.matvey.dealership.contracts.Models.OrderDto;
 import ru.matvey.dealership.contracts.Operations.CarComplictation;
 import ru.matvey.dealership.contracts.Operations.MakeOrder;
 import ru.matvey.dealership.contracts.Services.DealershipManagerService;
@@ -51,7 +49,8 @@ public class DealeshipManagerServiceImpl implements DealershipManagerService {
                 carPaint,
                 fuel,
                 transmission,
-                drivelayout);
+                drivelayout,
+                new Cost(100));
         UUID managerId = persistence.getManagerRepository().getRandomManager();
         ConfigurationOrder order = new ConfigurationOrder(clientId, car, managerId);
         persistence.getComplictaionOrderRepository().add(order);

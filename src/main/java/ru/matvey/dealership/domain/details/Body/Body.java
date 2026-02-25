@@ -29,7 +29,7 @@ public class Body implements IDetail {
 
     @Override
     public IDetailType Type() {
-        return null;
+        return type;
     }
 
     @Override

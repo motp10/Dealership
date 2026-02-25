@@ -2,6 +2,7 @@ package ru.matvey.dealership.domain.car;
 
 import ru.matvey.dealership.domain.Exceptions.IncompatibleComponentException;
 import ru.matvey.dealership.domain.details.Body.Body;
+import ru.matvey.dealership.domain.details.Cost;
 import ru.matvey.dealership.domain.details.IDetail;
 import ru.matvey.dealership.domain.details.Transmission.Transmission;
 import lombok.Builder;
@@ -27,14 +28,15 @@ public class Car {
     private final Transmission transmission;
     private final DriveLayout drivelayout;
     private final Map<Class<? extends IDetail>, IDetail> selectedComponents = new HashMap<>();
-
+    private final Cost defaultCost;
     public Car(String brand, 
                String model, 
                Body bodyType,
                CarPaint color,
                Fuel fuelType,
                Transmission transmissionType,
-               DriveLayout driveType) {
+               DriveLayout driveType,
+               Cost defaultCost) {
         boolean allCompatible = true;
         this.brand = brand;
         this.model = model;
@@ -43,6 +45,7 @@ public class Car {
         this.fuel = fuelType;
         this.transmission = transmissionType;
         this.drivelayout = driveType;
+        this.defaultCost = defaultCost;
     }
 
     public void addDetail(IDetail newDetail) {
