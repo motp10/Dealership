@@ -1,21 +1,18 @@
 package ru.matvey.dealership.domain.orders.stockCarOrder;
 
-import ru.matvey.dealership.domain.orders.IOrder;
-import ru.matvey.dealership.domain.orders.IStatus;
+import ru.matvey.dealership.domain.orders.Order;
+import ru.matvey.dealership.domain.orders.Status;
 import ru.matvey.dealership.domain.orders.stockCarOrder.status.StockCarOrderCreated;
-import ru.matvey.dealership.domain.users.ClientUser;
-import ru.matvey.dealership.domain.users.DealeshipManagerUser;
-import ru.matvey.dealership.domain.car.Car;
 
 import java.util.UUID;
 
 
-public class OrderStockCar implements IOrder {
+public class OrderStockCar implements Order {
     UUID id = UUID.randomUUID();
     private final UUID clientId;
     private final UUID carId;
     private final UUID managerId;
-    private IStatus orderStatus;
+    private Status orderStatus;
 
     public OrderStockCar(UUID client, UUID car, UUID managerId) {
         this.clientId = client;

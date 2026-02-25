@@ -4,12 +4,13 @@ import ru.matvey.dealership.domain.details.Cost;
 import ru.matvey.dealership.domain.details.IDetail;
 import ru.matvey.dealership.domain.details.IDetailType;
 import java.util.Set;
+import java.util.UUID;
 
 public class DriveLayout implements IDetail {
     private final DriveLayoutType type;
     private final Cost cost;
     private final Set<String> compatibleModels;
-
+    private UUID id = UUID.randomUUID();
     public DriveLayout(DriveLayoutType type, Cost cost, Set<String> compatibleModels) {
         this.type = type;
         this.cost = cost;
@@ -29,5 +30,10 @@ public class DriveLayout implements IDetail {
     @Override
     public boolean isCompatibleWith(String model) {
         return compatibleModels.contains(model);
+    }
+
+    @Override
+    public UUID getId() {
+        return id;
     }
 }

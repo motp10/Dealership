@@ -1,20 +1,20 @@
 package ru.matvey.dealership.domain.orders.stockCarOrder.status;
 
-import ru.matvey.dealership.domain.orders.IStatus;
+import ru.matvey.dealership.domain.orders.Status;
 
-public class StockCarOrderWaitingPayment implements IStatus {
+public class StockCarOrderWaitingPayment implements Status {
     @Override
-    public IStatus next() {
-        return null;
+    public Status next() {
+        return new StockCarPayed();
     }
 
     @Override
-    public IStatus cancel() {
-        return null;
+    public Status cancel() {
+        return new StockCarOrderCanceled();
     }
 
     @Override
     public String getName() {
-        return "";
+        return "waiting payment";
     }
 }

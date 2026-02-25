@@ -10,9 +10,7 @@ import ru.matvey.dealership.domain.details.color.PaintType;
 import ru.matvey.dealership.domain.details.drivelayout.DriveLayoutType;
 import ru.matvey.dealership.domain.details.fuel.FuelType;
 
-import javax.swing.plaf.synth.ColorType;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class InMemoryCarRepository implements CarsRepository {
     private final List<Car> storage = new ArrayList<>();
@@ -24,17 +22,20 @@ public class InMemoryCarRepository implements CarsRepository {
 
     @Override
     public void deleteById(UUID id) {
-        storage.remove(id);
+        storage.removeIf(x -> x.getId().equals(id));
     }
 
     @Override
     public Car findById(UUID id) {
-        return storage.stream().filter((x)->{return x.getId() == id; }).toList().getFirst();
+        return storage.stream()
+                .filter(x -> x.getId().equals(id))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
     public List<Car> getdAll() {
-        return storage;
+        return new ArrayList<>(storage);
     }
 
     @Override

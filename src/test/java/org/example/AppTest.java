@@ -8,6 +8,7 @@ import ru.matvey.dealership.contracts.Operations.CarComplictation;
 import ru.matvey.dealership.contracts.Operations.MakeOrder;
 import ru.matvey.dealership.contracts.Services.AdminService;
 import ru.matvey.dealership.contracts.Services.ClientService;
+import ru.matvey.dealership.domain.Exceptions.IncompatibleComponentException;
 import ru.matvey.dealership.domain.car.Car;
 import ru.matvey.dealership.domain.details.Body.Body;
 import ru.matvey.dealership.domain.details.Body.BodyType;
@@ -37,6 +38,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class AppTest {
     PersistanceRepository MakeGlobalRepository() {
@@ -148,12 +150,6 @@ class AppTest {
     }
 
     @Test
-    void DetailsCntTest() {
-        PersistanceRepository persistence = MakeGlobalRepository();
-        assertEquals(persistence.getDetailsRepository().getDetails().size(), 16);
-    }
-
-    @Test
     void AddTestDriveOrderTest() {
         PersistanceRepository persistence = MakeGlobalRepository();
         DealeshipManagerUser manager = new DealeshipManagerUser("manager", "132", "name");
@@ -188,4 +184,44 @@ class AppTest {
         assertEquals(persistence.getTestDriveRepository().getAll().size(), 1);
     }
 
+    @Test
+    void DetailsCntTest() {
+        PersistanceRepository persistence = MakeGlobalRepository();
+        assertEquals(persistence.getDetailsRepository().getDetails().size(), 16);
+    }
+
+    @Test
+    void CarOrderTest() {
+        PersistanceRepository persistence = MakeGlobalRepository();
+        DealeshipManagerUser manager = new DealeshipManagerUser("manager", "132", "name");
+        persistence.getManagerRepository().AddManager(manager);
+        ClientService clientService = new ClientServiceImpl(persistence);
+        AdminService adminService = new SystemAdminServiceImpl(persistence);
+        Set<String> ss = new HashSet<String>();
+
+        Car testCar = new Car(
+                "BMW",
+                "X5",
+                new Body(new BodyType("Black SUV"), new Cost(13), ss),
+                new CarPaint(new PaintType("Green"), new Cost(123), ss),
+                new Fuel(new FuelType("Gasoline"), new Cost(123), ss),
+                new Transmission(new TransmissionType("Good transmission"), new Cost(123), ss),
+                new DriveLayout(new DriveLayoutType("AWD"), new Cost(123), ss)
+        );
+        Car testCar2 = new Car(
+                "Mersedes",
+                "H7",
+                new Body(new BodyType("Black SUV"), new Cost(13), ss),
+                new CarPaint(new PaintType("Green"), new Cost(123), ss),
+                new Fuel(new FuelType("Gasoline"), new Cost(123), ss),
+                new Transmission(new TransmissionType("Good transmission"), new Cost(123), ss),
+                new DriveLayout(new DriveLayoutType("AWD"), new Cost(123), ss)
+        );
+        ClientUser clientUser = new ClientUser("SomeName", "1234", "FullName");
+        MakeOrder.Request order = new MakeOrder.Request(testCar.getId(), clientUser.GetId());
+        persistence.getCarRepository().addCar(testCar);
+        persistence.getCarRepository().addCar(testCar2);
+        clientService.makeStockCarOrder(order);
+        assertEquals(persistence.getStockCarOrderRepository().getAll().size(), 1);
+    }
 }

@@ -11,26 +11,30 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryTestDriveRepository implements TestDriveRepository {
-    private final List<TestDriveOrder> storage = new ArrayList();
+    private final List<TestDriveOrder> storage = new ArrayList<>();
 
     @Override
     public void addOrder(TestDriveOrder order) {
-        storage.add(order);
+        if (order != null) {
+            storage.add(order);
+        }
     }
 
     @Override
     public TestDriveOrder findById(UUID id) {
-        return storage.stream().filter((x)->{return x.getId() == id; }).toList().getFirst();
+        return storage.stream()
+                .filter(x -> x.getId().equals(id))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
     public List<TestDriveOrder> getAll() {
-        return storage;
+        return List.copyOf(storage);
     }
 
     @Override
     public void deleteById(UUID id) {
-        TestDriveOrder orderToDelete = storage.stream().filter((x)->{return x.getId() == id; }).toList().getFirst();
-        storage.remove(orderToDelete);
+        storage.removeIf(x -> x.getId().equals(id));
     }
 }

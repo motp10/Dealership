@@ -4,11 +4,14 @@ import ru.matvey.dealership.domain.details.Cost;
 import ru.matvey.dealership.domain.details.IDetail;
 import ru.matvey.dealership.domain.details.IDetailType;
 import java.util.Set;
+import java.util.UUID;
 
 public class CarPaint implements IDetail {
     private final PaintType type;
     private final Cost cost;
     private final Set<String> compatibleModels;
+
+    private UUID id = UUID.randomUUID();
 
     public CarPaint(String type, double cost, Set<String> compatibleModels) {
         this.type = new PaintType(type);
@@ -36,5 +39,10 @@ public class CarPaint implements IDetail {
     @Override
     public boolean isCompatibleWith(String model) {
         return compatibleModels.contains(model);
+    }
+
+    @Override
+    public UUID getId() {
+        return id;
     }
 }

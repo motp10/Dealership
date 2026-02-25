@@ -1,20 +1,20 @@
 package ru.matvey.dealership.domain.orders.configurationOrder.status;
 
-import ru.matvey.dealership.domain.orders.IStatus;
+import ru.matvey.dealership.domain.orders.Status;
 
-public class ConfigurationOrderWaitingPayment implements IStatus {
+public class ConfigurationOrderWaitingPayment implements Status {
     @Override
-    public IStatus next() {
-        return null;
+    public Status next() {
+        return new ConfigurationOrderPayed();
     }
 
     @Override
-    public IStatus cancel() {
-        return null;
+    public Status cancel() {
+        return new ConfigurationOrderCanceled();
     }
 
     @Override
     public String getName() {
-        return "";
+        return "waiting payment";
     }
 }

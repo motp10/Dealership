@@ -6,12 +6,14 @@ import ru.matvey.dealership.domain.details.IDetailType;
 
 import java.math.BigDecimal;
 import java.util.Set;
+import java.util.UUID;
 
 public class Body implements IDetail {
     private final BodyType type;
     private final Cost cost;
     private final Set<String> compatibleModels;
 
+    private UUID id = UUID.randomUUID();
 
     public Body(String type, double cost, Set<String> compatibleModels) {
         this.type = new BodyType(type);
@@ -38,5 +40,10 @@ public class Body implements IDetail {
     @Override
     public boolean isCompatibleWith(String model) {
         return compatibleModels.contains(model);
+    }
+
+    @Override
+    public UUID getId() {
+        return id;
     }
 }

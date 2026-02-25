@@ -6,11 +6,13 @@ import ru.matvey.dealership.domain.details.IDetailType;
 import ru.matvey.dealership.domain.details.Transmission.TransmissionType;
 
 import java.util.Set;
+import java.util.UUID;
 
 public class Wheel implements IDetail {
     private final WheelType type;
     private final Cost cost;
     private final Set<String> compatibleModels;
+    private UUID id = UUID.randomUUID();
 
     public Wheel(WheelType type, Cost cost, Set<String> compatibleModels) {
         this.type = type;
@@ -31,5 +33,10 @@ public class Wheel implements IDetail {
     @Override
     public boolean isCompatibleWith(String model) {
         return compatibleModels.contains(model);
+    }
+
+    @Override
+    public UUID getId() {
+        return id;
     }
 }

@@ -1,20 +1,20 @@
 package ru.matvey.dealership.domain.orders.stockCarOrder.status;
 
-import ru.matvey.dealership.domain.orders.IStatus;
+import ru.matvey.dealership.domain.orders.Status;
 
-public class StockCarCarIsReady implements IStatus {
+public class StockCarCarIsReady implements Status {
     @Override
-    public IStatus next() {
-        return null;
+    public Status next() {
+        return new StockCarOrderClosed();
     }
 
     @Override
-    public IStatus cancel() {
-        return null;
+    public Status cancel() {
+        throw new RuntimeException("order cannot be canceld");
     }
 
     @Override
     public String getName() {
-        return "";
+        return "ready";
     }
 }

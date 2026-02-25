@@ -9,32 +9,37 @@ import java.util.List;
 import java.util.UUID;
 
 public class InMemoryDetailsRepository implements DetailsRepository {
-    private List<IDetail> storege = new ArrayList<>();
+    private List<IDetail> storage = new ArrayList<>();
 
     @Override
     public List<IDetail> getDetails() {
-        return storege;
+        return new ArrayList<>(storage);
     }
 
     @Override
     public void addDetail(IDetail detail) {
-        storege.add(detail);
+        if (detail != null) {
+            storage.add(detail);
+        }
     }
 
     @Override
     public void deleteDetail(UUID id) {
-        IDetail detailToDelete = getDetail(id);
-        storege.remove(detailToDelete);
+        storage.removeIf(detail -> detail.getId().equals(id));
     }
 
     @Override
     public List<IDetail> getDetails(IDetailType type) {
-        return storege.stream()
-                .filter(detail -> detail.Type().equals(type)).toList();
+        return storage.stream()
+                .filter(detail -> detail.Type().equals(type))
+                .toList();
     }
 
     @Override
     public IDetail getDetail(UUID id) {
-        return null;
+        return storage.stream()
+                .filter(detail -> detail.getId().equals(id))
+                .findFirst()
+                .orElse(null);
     }
 }

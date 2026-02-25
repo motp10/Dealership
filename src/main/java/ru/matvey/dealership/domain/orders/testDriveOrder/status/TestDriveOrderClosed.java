@@ -1,20 +1,20 @@
 package ru.matvey.dealership.domain.orders.testDriveOrder.status;
 
-import ru.matvey.dealership.domain.orders.IStatus;
+import ru.matvey.dealership.domain.orders.Status;
 
-public class TestDriveOrderClosed implements IStatus {
+public class TestDriveOrderClosed implements Status {
     @Override
-    public IStatus next() {
-        return null;
+    public Status next() {
+        return this;
     }
 
     @Override
-    public IStatus cancel() {
-        return null;
+    public Status cancel() {
+        return this;
     }
 
     @Override
     public String getName() {
-        return "";
+        return "closed";
     }
 }

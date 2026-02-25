@@ -6,11 +6,13 @@ import ru.matvey.dealership.domain.details.IDetailType;
 import ru.matvey.dealership.domain.details.drivelayout.DriveLayoutType;
 
 import java.util.Set;
+import java.util.UUID;
 
 public class Fuel implements IDetail {
     private final FuelType type;
     private final Cost cost;
     private final Set<String> compatibleModels;
+    private UUID id = UUID.randomUUID();
 
     public Fuel(FuelType type, Cost cost, Set<String> compatibleModels) {
         this.type = type;
@@ -31,5 +33,10 @@ public class Fuel implements IDetail {
     @Override
     public boolean isCompatibleWith(String model) {
         return compatibleModels.contains(model);
+    }
+
+    @Override
+    public UUID getId() {
+        return id;
     }
 }

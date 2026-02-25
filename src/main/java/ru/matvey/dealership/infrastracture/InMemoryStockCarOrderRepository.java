@@ -20,6 +20,6 @@ public class InMemoryStockCarOrderRepository implements StockCarOrderRepository 
 
     @Override
     public List<OrderStockCar> getAll() {
-        return List.of();
+        return storage;
     }
 }
