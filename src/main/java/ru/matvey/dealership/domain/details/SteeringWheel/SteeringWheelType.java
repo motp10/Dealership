@@ -1,8 +1,8 @@
 package ru.matvey.dealership.domain.details.SteeringWheel;
 
-import ru.matvey.dealership.domain.details.IDetailType;
+import ru.matvey.dealership.domain.details.DetailType;
 
-public record SteeringWheelType(String value) implements IDetailType {
+public record SteeringWheelType(String value) implements DetailType {
     @Override
     public String Value() {
         return value;

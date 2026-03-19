@@ -9,16 +9,16 @@ import ru.matvey.dealership.domain.details.drivelayout.DriveLayoutType;
 import ru.matvey.dealership.domain.details.fuel.FuelType;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import ru.matvey.dealership.domain.car.Car;
 
 public interface CarsRepository {
-    void addCar(Car car);
-    void deleteById(UUID id);
-    Car findById(UUID id);
-    List<Car> getdAll();
-
+    void add(Car car);
+    void delete(UUID id);
+    Optional<Car> findById(UUID id);
+    List<Car> getAll();
     List<Car> findByCriteria( Cost maxPrice,
                               String brand,
                               String model,

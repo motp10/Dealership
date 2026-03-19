@@ -6,31 +6,23 @@ import ru.matvey.dealership.abstraction.*;
 @Getter
 public class PersistanceRepositoryImpl implements PersistanceRepository {
     private DetailsRepository detailsRepository;
-    private ManagersRepository managersRepository;
+    private UserRepository userRepository;
     private ComplictaionOrderRepository complictaionOrderRepository;
     private CarsRepository carsRepository;
     private StockCarOrderRepository stockCarOrderRepository;
     private TestDriveRepository testDriveRepository;
     public PersistanceRepositoryImpl(DetailsRepository detailsRepository,
-                                     ManagersRepository managersRepository,
+                                     UserRepository managersRepository,
                                      ComplictaionOrderRepository complictaionOrderRepository,
                                      CarsRepository carsRepository,
                                      StockCarOrderRepository stockCarOrderRepository,
                                      TestDriveRepository testDriveRepository) {
         this.carsRepository = carsRepository;
-        this.managersRepository = managersRepository;
+        this.userRepository = managersRepository;
         this.complictaionOrderRepository = complictaionOrderRepository;
         this.detailsRepository = detailsRepository;
         this.testDriveRepository = testDriveRepository;
         this.stockCarOrderRepository = stockCarOrderRepository;
-    }
-    public PersistanceRepositoryImpl() {
-        this.carsRepository = new InMemoryCarRepository();
-        this.managersRepository = new InMemmoryManagersRepository();
-        this.complictaionOrderRepository = new InMemoryComplictationOrderRepository();
-        this.detailsRepository = new InMemoryDetailsRepository();
-        this.testDriveRepository = new InMemoryTestDriveRepository();
-        this.stockCarOrderRepository = new InMemoryStockCarOrderRepository();
     }
 
     @Override
@@ -54,8 +46,8 @@ public class PersistanceRepositoryImpl implements PersistanceRepository {
     }
 
     @Override
-    public ManagersRepository getManagerRepository() {
-        return managersRepository;
+    public UserRepository getUserRepository() {
+        return userRepository;
     }
 
     @Override

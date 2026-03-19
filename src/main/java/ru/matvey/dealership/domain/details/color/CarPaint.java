@@ -1,23 +1,20 @@
 package ru.matvey.dealership.domain.details.color;
 
+import ru.matvey.dealership.domain.details.Body.BodyType;
 import ru.matvey.dealership.domain.details.Cost;
-import ru.matvey.dealership.domain.details.IDetail;
-import ru.matvey.dealership.domain.details.IDetailType;
+import ru.matvey.dealership.domain.details.Detail;
+import ru.matvey.dealership.domain.details.DetailType;
+
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class CarPaint implements IDetail {
-    private final PaintType type;
-    private final Cost cost;
-    private final Set<String> compatibleModels;
+public class CarPaint implements Detail {
+    private PaintType type;
+    private Cost cost;
+    private Set<String> compatibleModels;
 
     private UUID id = UUID.randomUUID();
-
-    public CarPaint(String type, double cost, Set<String> compatibleModels) {
-        this.type = new PaintType(type);
-        this.cost = new Cost(cost);
-        this.compatibleModels = compatibleModels;
-    }
 
     public CarPaint(PaintType type, Cost cost, Set<String> compatibleModels) {
         this.type = type;
@@ -25,9 +22,21 @@ public class CarPaint implements IDetail {
         this.compatibleModels = compatibleModels;
     }
 
+    public CarPaint(UUID id, PaintType type, Cost cost, Set<String> compatibleModels) {
+        this.id = id;
+        this.type = type;
+        this.cost = cost;
+        this.compatibleModels = compatibleModels;
+    }
+
 
     @Override
-    public IDetailType Type() {
+    public String Type() {
+        return "Paint";
+    }
+
+    @Override
+    public DetailType Info() {
         return type;
     }
 
@@ -39,6 +48,10 @@ public class CarPaint implements IDetail {
     @Override
     public boolean isCompatibleWith(String model) {
         return compatibleModels.contains(model);
+    }
+    @Override
+    public Set<String> CompatibleModels() {
+        return new HashSet<>(compatibleModels);
     }
 
     @Override

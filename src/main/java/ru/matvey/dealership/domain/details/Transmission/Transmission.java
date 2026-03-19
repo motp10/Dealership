@@ -1,14 +1,14 @@
 package ru.matvey.dealership.domain.details.Transmission;
 
 import ru.matvey.dealership.domain.details.Cost;
-import ru.matvey.dealership.domain.details.IDetail;
-import ru.matvey.dealership.domain.details.IDetailType;
-import ru.matvey.dealership.domain.details.SteeringWheel.SteeringWheelType;
+import ru.matvey.dealership.domain.details.Detail;
+import ru.matvey.dealership.domain.details.DetailType;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class Transmission implements IDetail {
+public class Transmission implements Detail {
     private final TransmissionType type;
     private final Cost cost;
     private final Set<String> compatibleModels;
@@ -19,9 +19,19 @@ public class Transmission implements IDetail {
         this.cost = cost;
         this.compatibleModels = compatibleModels;
     }
+    public Transmission(UUID id, TransmissionType type, Cost cost, Set<String> compatibleModels) {
+        this.type = type;
+        this.cost = cost;
+        this.compatibleModels = compatibleModels;
+    }
 
     @Override
-    public IDetailType Type() {
+    public String Type() {
+        return "Transmission";
+    }
+
+    @Override
+    public DetailType Info() {
         return type;
     }
 
@@ -33,6 +43,11 @@ public class Transmission implements IDetail {
     @Override
     public boolean isCompatibleWith(String model) {
         return compatibleModels.contains(model);
+    }
+
+    @Override
+    public Set<String> CompatibleModels() {
+        return new HashSet<>(compatibleModels);
     }
 
     @Override

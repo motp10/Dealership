@@ -1,8 +1,8 @@
 package ru.matvey.dealership.domain.details.Interior;
 
-import ru.matvey.dealership.domain.details.IDetailType;
+import ru.matvey.dealership.domain.details.DetailType;
 
-public record InteriorType(String value) implements IDetailType {
+public record InteriorType(String value) implements DetailType {
 
     @Override
     public String Value() {

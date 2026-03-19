@@ -1,14 +1,14 @@
 package ru.matvey.dealership.domain.details.Interior;
 
 import ru.matvey.dealership.domain.details.Cost;
-import ru.matvey.dealership.domain.details.IDetail;
-import ru.matvey.dealership.domain.details.IDetailType;
-import ru.matvey.dealership.domain.details.fuel.FuelType;
+import ru.matvey.dealership.domain.details.Detail;
+import ru.matvey.dealership.domain.details.DetailType;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class Interior implements IDetail {
+public class Interior implements Detail {
     private final InteriorType type;
     private final Cost cost;
     private final Set<String> compatibleModels;
@@ -20,8 +20,20 @@ public class Interior implements IDetail {
         this.compatibleModels = compatibleModels;
     }
 
+    public Interior(UUID id, InteriorType type, Cost cost, Set<String> compatibleModels) {
+        this.id = id;
+        this.type = type;
+        this.cost = cost;
+        this.compatibleModels = compatibleModels;
+    }
+
     @Override
-    public IDetailType Type() {
+    public String Type() {
+        return "Interior";
+    }
+
+    @Override
+    public DetailType Info() {
         return type;
     }
 
@@ -33,6 +45,11 @@ public class Interior implements IDetail {
     @Override
     public boolean isCompatibleWith(String model) {
         return compatibleModels.contains(model);
+    }
+
+    @Override
+    public Set<String> CompatibleModels() {
+        return new HashSet<>(compatibleModels);
     }
 
     @Override

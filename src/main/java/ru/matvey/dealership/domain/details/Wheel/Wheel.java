@@ -1,14 +1,14 @@
 package ru.matvey.dealership.domain.details.Wheel;
 
 import ru.matvey.dealership.domain.details.Cost;
-import ru.matvey.dealership.domain.details.IDetail;
-import ru.matvey.dealership.domain.details.IDetailType;
-import ru.matvey.dealership.domain.details.Transmission.TransmissionType;
+import ru.matvey.dealership.domain.details.Detail;
+import ru.matvey.dealership.domain.details.DetailType;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class Wheel implements IDetail {
+public class Wheel implements Detail {
     private final WheelType type;
     private final Cost cost;
     private final Set<String> compatibleModels;
@@ -19,9 +19,19 @@ public class Wheel implements IDetail {
         this.cost = cost;
         this.compatibleModels = compatibleModels;
     }
+    public Wheel(UUID id, WheelType type, Cost cost, Set<String> compatibleModels) {
+        this.type = type;
+        this.cost = cost;
+        this.compatibleModels = compatibleModels;
+    }
 
     @Override
-    public IDetailType Type() {
+    public String Type() {
+        return "Wheel";
+    }
+
+    @Override
+    public DetailType Info() {
         return type;
     }
 
@@ -33,6 +43,11 @@ public class Wheel implements IDetail {
     @Override
     public boolean isCompatibleWith(String model) {
         return compatibleModels.contains(model);
+    }
+
+    @Override
+    public Set<String> CompatibleModels() {
+        return new HashSet<>(compatibleModels);
     }
 
     @Override

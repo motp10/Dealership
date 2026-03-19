@@ -5,7 +5,7 @@ import ru.matvey.dealership.domain.orders.Status;
 public class StockCarPayed implements Status {
     @Override
     public Status next() {
-        return new StockCarCarIsReady();
+        return new StockCarReady();
     }
 
     @Override

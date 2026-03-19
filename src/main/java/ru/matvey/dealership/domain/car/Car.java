@@ -1,9 +1,11 @@
 package ru.matvey.dealership.domain.car;
 
-import ru.matvey.dealership.domain.Exceptions.IncompatibleComponentException;
+import lombok.NonNull;
+import ru.matvey.dealership.domain.exceptions.DomainValidationException;
+import ru.matvey.dealership.domain.exceptions.IncompatibleComponentException;
 import ru.matvey.dealership.domain.details.Body.Body;
 import ru.matvey.dealership.domain.details.Cost;
-import ru.matvey.dealership.domain.details.IDetail;
+import ru.matvey.dealership.domain.details.Detail;
 import ru.matvey.dealership.domain.details.Transmission.Transmission;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,29 +17,33 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Collections;
 import java.util.UUID;
-
 @Builder
 @Getter
 public class Car {
-    private final UUID id = UUID.randomUUID();
-    private final String brand;
-    private final String model;
-    private final Body body;
-    private final CarPaint carPaint;
-    private final Fuel fuel;
-    private final Transmission transmission;
-    private final DriveLayout drivelayout;
-    private final Map<Class<? extends IDetail>, IDetail> selectedComponents = new HashMap<>();
-    private final Cost defaultCost;
-    public Car(String brand, 
-               String model, 
-               Body bodyType,
-               CarPaint color,
-               Fuel fuelType,
-               Transmission transmissionType,
-               DriveLayout driveType,
-               Cost defaultCost) {
-        boolean allCompatible = true;
+    private UUID id;
+    private String brand;
+    private String model;
+    @NonNull private Body body;
+    @NonNull private CarPaint carPaint;
+    @NonNull private Fuel fuel;
+    @NonNull private Transmission transmission;
+    @NonNull private DriveLayout drivelayout;
+    @NonNull private Cost defaultCost;
+    public Car(@NonNull String brand,
+               @NonNull String model,
+               @NonNull Body bodyType,
+               @NonNull CarPaint color,
+               @NonNull Fuel fuelType,
+               @NonNull Transmission transmissionType,
+               @NonNull DriveLayout driveType,
+               @NonNull Cost defaultCost) {
+        if (!bodyType.isCompatibleWith(model)) throw new DomainValidationException("body is not compatible with model");
+        if (!color.isCompatibleWith(model)) throw new DomainValidationException("color is not compatible with model");
+        if (!fuelType.isCompatibleWith(model)) throw new DomainValidationException("fuel is not compatible with model");
+        if (!transmissionType.isCompatibleWith(model)) throw new DomainValidationException("transmission is not compatible with model");
+        if (!driveType.isCompatibleWith(model)) throw new DomainValidationException("drivelayout is not compatible with model");
+
+        this.id = UUID.randomUUID();
         this.brand = brand;
         this.model = model;
         this.body = bodyType;
@@ -48,24 +54,41 @@ public class Car {
         this.defaultCost = defaultCost;
     }
 
-    public void addDetail(IDetail newDetail) {
-        if (!newDetail.isCompatibleWith(this.model)) {
-            throw new IncompatibleComponentException(
-                    "Detail " + newDetail.getClass().getSimpleName() + " is incompatible with model " + this.model
-            );
-        }
-        selectedComponents.put(newDetail.getClass(), newDetail);
+    public Car(UUID id,
+               @NonNull String brand,
+               @NonNull String model,
+               @NonNull Body bodyType,
+               @NonNull CarPaint color,
+               @NonNull Fuel fuelType,
+               @NonNull Transmission transmissionType,
+               @NonNull DriveLayout driveType,
+               @NonNull Cost defaultCost) {
+
+        if (!bodyType.isCompatibleWith(model)) throw new DomainValidationException("body is not compatible with model");
+        if (!color.isCompatibleWith(model)) throw new DomainValidationException("color is not compatible with model");
+        if (!fuelType.isCompatibleWith(model)) throw new DomainValidationException("fuel is not compatible with model");
+        if (!transmissionType.isCompatibleWith(model)) throw new DomainValidationException("transmission is not compatible with model");
+        if (!driveType.isCompatibleWith(model)) throw new DomainValidationException("drivelayout is not compatible with model");
+
+        this.id = id;
+        this.brand = brand;
+        this.model = model;
+        this.body = bodyType;
+        this.carPaint = color;
+        this.fuel = fuelType;
+        this.transmission = transmissionType;
+        this.drivelayout = driveType;
+        this.defaultCost = defaultCost;
     }
 
     public double getTotalPrice() {
         double totalSum = 0;
-        for (var detail : selectedComponents.values()) {
-            totalSum += detail.Cost();
-        }
+        totalSum += body.Cost();
+        totalSum += carPaint.Cost();
+        totalSum += fuel.Cost();
+        totalSum += transmission.Cost();
+        totalSum += drivelayout.Cost();
+        totalSum += defaultCost.value();
         return totalSum;
-    }
-
-    public Map<Class<? extends IDetail>, IDetail> getSelectedComponents() {
-        return Collections.unmodifiableMap(selectedComponents);
     }
 }

@@ -1,8 +1,8 @@
 package ru.matvey.dealership.domain.details.Transmission;
 
-import ru.matvey.dealership.domain.details.IDetailType;
+import ru.matvey.dealership.domain.details.DetailType;
 
-public record TransmissionType(String value) implements IDetailType {
+public record TransmissionType(String value) implements DetailType {
 
     @Override
     public String Value() {

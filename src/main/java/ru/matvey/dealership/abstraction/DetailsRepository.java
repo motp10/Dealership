@@ -1,15 +1,16 @@
 package ru.matvey.dealership.abstraction;
 
-import ru.matvey.dealership.domain.details.IDetail;
-import ru.matvey.dealership.domain.details.IDetailType;
+import ru.matvey.dealership.domain.details.Detail;
+import ru.matvey.dealership.domain.details.DetailType;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface DetailsRepository {
-    List<IDetail> getDetails();
-    void addDetail(IDetail detail);
-    void deleteDetail(UUID id);
-    List<IDetail> getDetails(IDetailType type);
-    IDetail getDetail(UUID id);
+    List<Detail> getDetails();
+    void add(Detail detail);
+    void delete(UUID id);
+    List<Detail> getDetails(DetailType type);
+    Optional<Detail> findById(UUID id);
 }

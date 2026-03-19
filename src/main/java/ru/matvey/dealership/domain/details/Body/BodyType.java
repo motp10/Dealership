@@ -1,8 +1,8 @@
 package ru.matvey.dealership.domain.details.Body;
 
-import ru.matvey.dealership.domain.details.IDetailType;
+import ru.matvey.dealership.domain.details.DetailType;
 
-public record BodyType(String value) implements IDetailType {
+public record BodyType(String value) implements DetailType {
 
     @Override
     public String Value() {

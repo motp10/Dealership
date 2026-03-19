@@ -20,7 +20,7 @@ import ru.matvey.dealership.domain.details.fuel.FuelType;
 import java.util.Set;
 
 public class DetailsFactory {
-    public IDetail createDetail(String type, String info, double price, Set<String> compatitiveAuto) {
+    public Detail createDetail(String type, String info, double price, Set<String> compatitiveAuto) {
         return switch (type.toLowerCase()) {
             case "paint" -> new CarPaint(new PaintType(info), new Cost(price), compatitiveAuto);
             case "body" -> new Body(new BodyType(info), new Cost(price), compatitiveAuto);

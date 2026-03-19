@@ -1,8 +1,8 @@
 package ru.matvey.dealership.domain.details.fuel;
 
-import ru.matvey.dealership.domain.details.IDetailType;
+import ru.matvey.dealership.domain.details.DetailType;
 
-public record FuelType(String value) implements IDetailType {
+public record FuelType(String value) implements DetailType {
     @Override
     public String Value() {
         return value;

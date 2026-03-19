@@ -5,6 +5,6 @@ public interface PersistanceRepository {
     DetailsRepository getDetailsRepository();
     StockCarOrderRepository getStockCarOrderRepository();
     TestDriveRepository getTestDriveRepository();
-    ManagersRepository getManagerRepository();
+    UserRepository getUserRepository();
     ComplictaionOrderRepository getComplictaionOrderRepository();
 }
