@@ -41,17 +41,13 @@ public class SomeTest extends BaseIntegrationTest {
 
     @Test
     void user_ShouldBeCreatedAndDeleted() {
-        // Добавляем пользователя
         UUID id = userService.addUser("testUser", "password", "John Doe", "CLIENT");
 
-        // Проверяем, что он есть в БД
         var usersAfterAdd = userRepository.findAll();
         assertThat(usersAfterAdd).anyMatch(user -> user.getId().equals(id));
 
-        // Удаляем пользователя
         userService.deleteUser(id);
 
-        // Проверяем, что его больше нет в БД
         var usersAfterDelete = userRepository.findById(id);
         assertThat(usersAfterDelete).isEmpty();
     }
