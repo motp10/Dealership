@@ -34,7 +34,7 @@ public class DetailsRepositoryAdapter implements DetailsRepository {
 
     @Override
     public List<Detail> getDetails(DetailType type) {
-        return jpaDetailRepository.findByType(type.Value().toUpperCase());
+        return jpaDetailRepository.findByType(type.Value().toLowerCase());
     }
 
     @Override

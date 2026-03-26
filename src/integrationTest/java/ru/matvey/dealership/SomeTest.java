@@ -1,22 +1,24 @@
 package ru.matvey.dealership;
 
 import jakarta.transaction.Transactional;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.matvey.dealership.contracts.operations.CarComplictation;
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.matvey.dealership.contracts.operations.DetailOperation;
+import ru.matvey.dealership.contracts.services.CarService;
 import ru.matvey.dealership.contracts.services.DetailService;
+import ru.matvey.dealership.contracts.services.OrderService;
 import ru.matvey.dealership.contracts.services.UserService;
 import ru.matvey.dealership.infrastracture.jparepositories.JpaUserRepository;
 
 import java.util.Set;
 import java.util.UUID;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@Transactional
 public class SomeTest extends BaseIntegrationTest {
 
     @Autowired
@@ -25,123 +27,48 @@ public class SomeTest extends BaseIntegrationTest {
     @Autowired
     private DetailService detailService;
 
-    @Test
-    @Transactional
-    void addCar_ShouldPersistToDatabase() {
-        UUID id = userService.addUser("mam", "123", "big mom", "CLIENT");
-        userService.deleteUser(id);
-        var users = userRepository.findAll();
-        assertThat(users.size() == 0);
-    }
+    @Autowired
+    private CarService carService;
+
+    @Autowired
+    private OrderService orderService;
 
     @Autowired
     private JpaUserRepository userRepository;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     @Test
-    @Transactional
-    void shouldLoadSeedUsers() {
-        var users = userRepository.findAll();
-        userService.addUser("mam", "123", "big mom", "CLIENT");
-        assertThat(users.size() == 1);
+    void user_ShouldBeCreatedAndDeleted() {
+        // Добавляем пользователя
+        UUID id = userService.addUser("testUser", "password", "John Doe", "CLIENT");
+
+        // Проверяем, что он есть в БД
+        var usersAfterAdd = userRepository.findAll();
+        assertThat(usersAfterAdd).anyMatch(user -> user.getId().equals(id));
+
+        // Удаляем пользователя
+        userService.deleteUser(id);
+
+        // Проверяем, что его больше нет в БД
+        var usersAfterDelete = userRepository.findById(id);
+        assertThat(usersAfterDelete).isEmpty();
     }
+
     @Test
-    void addCar_ShouldSaveCarToDatabase_WhenDetailsAreCompatible() {
-        String targetModel = "model";
+    void detail_ShouldBeCreatedAndFetched() {
+        String targetModel = "Camry";
 
-        UUID bodyId = detailService.addDetail(new DetailOperation.Request("body", "body", 10, Set.of(targetModel)));
-        detailService.addDetail(new DetailOperation.Request("fuel", "fuel", 10, Set.of(targetModel)));
-        detailService.addDetail(new DetailOperation.Request("transmission", "transmission", 10, Set.of(targetModel)));
-        detailService.addDetail(new DetailOperation.Request("drivelayout", "drivelayout", 10, Set.of(targetModel)));
-        detailService.addDetail(new DetailOperation.Request("fuel", "fuel", 10, Set.of(targetModel)));
-        detailService.addDetail(new DetailOperation.Request("wheel", "wheel", 10, Set.of(targetModel)));
-        detailService.addDetail(new DetailOperation.Request("interior", "interior", 10, Set.of(targetModel)));
-
-
-        CarComplictation complication = new CarComplictation(
-                1500,
-                "brand",
-                targetModel,
-                "body",
-                "fuel",
-                "transmission",
-                "drive",
-                "color",
-                "wheel"
+        UUID detailId = detailService.addDetail(
+                new DetailOperation.Request("body", "Sedan", 1500.0, Set.of(targetModel))
         );
 
-        Assertions.assertThat(detailService.getAllDetails().size() == 7);
-        var x = detailService.getDetail(bodyId);
-        assertThat(x.cost() == 10);
+        var detail = detailService.getDetail(detailId);
+
+        assertThat(detail).isNotNull();
+        assertThat(detail.cost()).isEqualTo(1500.0);
+        assertThat(detail.detailInfo()).isEqualTo("Sedan");
+        assertThat(detail.detailType()).isEqualTo("Body");
     }
 }
-
-
-//
-//    @Test
-//    void updateCar_ShouldModifyDatabase() {
-//        // Arrange
-//        var car = saveNewCar();
-//        var carModel = new CarModelDto(
-//                "Updated Brand",
-//                car.getModel(),
-//                car.getBasePrice(),
-//                car.getColor(),
-//                vehicleEnumMapper.toDto(car.getBodyType()),
-//                vehicleEnumMapper.toDto(car.getFuelType()),
-//                car.getEnginePower(),
-//                car.getEngineVolume(),
-//                vehicleEnumMapper.toDto(car.getTransmissionType()),
-//                vehicleEnumMapper.toDto(car.getDriveType()));
-//
-//        var request = new UpdateCarRequest();
-//        request.setCarId(car.getId());
-//        request.setCarModel(carModel);
-//
-//        // Act
-//        ResponseEntity<?> response = carHandler.updateCar(request);
-//
-//        // Assert
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-//
-//        var updatedCar = carJpaRepository.findById(car.getId()).orElseThrow();
-//        assertThat(updatedCar.getBrand()).isEqualTo("Updated Brand");
-//    }
-//
-//    @Test
-//    void removeCar_ShouldDeleteFromDatabase() {
-//        // Arrange
-//        var car = saveNewCar();
-//        var request = new RemoveCarRequest();
-//        request.setId(car.getId());
-//
-//        // Act
-//        ResponseEntity<?> response = carHandler.removeCar(request);
-//
-//        // Assert
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-//        assertThat(carJpaRepository.findById(car.getId())).isEmpty();
-//    }
-//
-//    @Test
-//    @Transactional
-//    void addCarWithDetails_ShouldSaveManyToManyRelationship() {
-//        // Arrange
-//        var sparePart =
-//[3/19/26 7:02 PM] Шапка: sparePartJpaRepository.saveAndFlush(createSparePartEntity());
-//
-//        var car = createCarEntity();
-//        car.setDetails(List.of(sparePart));
-//
-//        carJpaRepository.saveAndFlush(car);
-//
-//        // Assert
-//        var foundCar = carJpaRepository.findById(car.getId()).orElseThrow();
-//        assertThat(carJpaRepository.count()).isEqualTo(1);
-//        assertThat(foundCar.getDetails().getFirst().getName()).isEqualTo(sparePart.getName());
-//    }
-//
-//    private CarEntity saveNewCar() {
-//        var car = createCarEntity();
-//        return carJpaRepository.saveAndFlush(car);
-//    }
-//}
