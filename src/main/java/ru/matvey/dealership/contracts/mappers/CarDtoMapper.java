@@ -2,7 +2,6 @@ package ru.matvey.dealership.contracts.mappers;
 
 import ru.matvey.dealership.contracts.models.CarDto;
 import ru.matvey.dealership.domain.car.Car;
-import ru.matvey.dealership.infrastracture.jpa.CarEntity;
 
 public class CarDtoMapper {
     public static CarDto toDto(Car car) {

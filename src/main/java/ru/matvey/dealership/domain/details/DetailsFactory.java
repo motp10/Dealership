@@ -29,7 +29,6 @@ public class DetailsFactory {
             case "fuel" -> new Fuel(new FuelType(info), new Cost(price), compatitiveAuto);
             case "interior" -> new Interior(new InteriorType(info), new Cost(price), compatitiveAuto);
             case "Steering wheel" -> new SteeringWheel(new SteeringWheelType(info), new Cost(price), compatitiveAuto);
-            case "Transmission"-> new Transmission(new TransmissionType(info), new Cost(price), compatitiveAuto);
             case "wheel" -> new Wheel(new WheelType(info), new Cost(price), compatitiveAuto);
             default -> throw new IllegalArgumentException("Unknown detail type: " + type);
         };

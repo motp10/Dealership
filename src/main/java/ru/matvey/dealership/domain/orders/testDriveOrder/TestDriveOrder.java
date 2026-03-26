@@ -1,43 +1,99 @@
 package ru.matvey.dealership.domain.orders.testDriveOrder;
 
-import lombok.Builder;
+import jakarta.persistence.*;
+import java.time.Instant;
+import java.util.UUID;
 import lombok.Getter;
 import ru.matvey.dealership.domain.orders.Order;
 import ru.matvey.dealership.domain.orders.Status;
 import ru.matvey.dealership.domain.orders.stockCarOrder.status.StockCarOrderCreated;
 
-import java.util.UUID;
-
-@Builder
+@Entity
+@Table(name = "test_drive_orders")
+@Getter
 public class TestDriveOrder implements Order {
-    private final UUID id;
-    private final UUID clientId;
-    private final UUID managerId;
-    private final UUID carId;
+
+    @Id
+    @Column(updatable = false, nullable = false)
+    private UUID id;
+
+    @Column(name = "client_id")
+    private UUID clientId;
+
+    @Column(name = "manager_id")
+    private UUID managerId;
+
+    @Column(name = "car_id")
+    private UUID carId;
+
+    @Column(name = "status")
+    private String statusName;
+
+    @Transient
     private Status status;
 
-    public TestDriveOrder(UUID id, UUID clientID, UUID carId, UUID managerId, Status status) {
-        this.id = id;
-        this.clientId = clientID;
-        this.carId = carId;
-        this.managerId = managerId;
-        this.status = status;
-    }
+    @Column(name = "created_at", updatable = false)
+    private Instant createdAt;
 
-    public TestDriveOrder(UUID clientID, UUID carId, UUID managerId) {
-        id = UUID.randomUUID();
-        this.clientId = clientID;
+    @Column(name = "updated_at")
+    private Instant updatedAt;
+
+    @Column(name = "removed")
+    private boolean removed = false;
+
+    protected TestDriveOrder() {}
+
+    public TestDriveOrder(UUID clientId, UUID carId, UUID managerId) {
+        this.id = UUID.randomUUID();
+        this.clientId = clientId;
         this.carId = carId;
         this.managerId = managerId;
         this.status = new StockCarOrderCreated();
+        this.statusName = status.getName();
     }
+
+    public TestDriveOrder(
+        UUID id,
+        UUID clientId,
+        UUID carId,
+        UUID managerId,
+        Status status
+    ) {
+        this.id = id;
+        this.clientId = clientId;
+        this.carId = carId;
+        this.managerId = managerId;
+        this.status = status;
+        this.statusName = status.getName();
+    }
+
+    @PostLoad
+    protected void onLoad() {
+        this.status = new TestDriveStatusFactory().Create(statusName);
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = Instant.now();
+        updatedAt = Instant.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = Instant.now();
+        if (status != null) statusName = status.getName();
+    }
+
     @Override
     public void nextStep() {
-        this.status = this.status.next();
+        status = status.next();
+        statusName = status.getName();
     }
+
     @Override
     public void cancel() {
-        this.status = this.status.cancel();
+        status = status.cancel();
+        statusName = status.getName();
     }
 
     @Override
@@ -62,6 +118,6 @@ public class TestDriveOrder implements Order {
 
     @Override
     public String getStatus() {
-        return status.getName();
+        return statusName;
     }
 }

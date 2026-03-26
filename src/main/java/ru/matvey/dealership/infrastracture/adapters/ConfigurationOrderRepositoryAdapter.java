@@ -1,13 +1,10 @@
 package ru.matvey.dealership.infrastracture.adapters;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.matvey.dealership.abstraction.ComplictaionOrderRepository;
 import ru.matvey.dealership.domain.orders.configurationOrder.ConfigurationOrder;
-import ru.matvey.dealership.infrastracture.jpa.ComplictationOrderEntity;
 import ru.matvey.dealership.infrastracture.jparepositories.JpaConfigurationOrderRepository;
-import ru.matvey.dealership.infrastracture.mappers.ConfigurationOrderMapper;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,12 +15,10 @@ import java.util.UUID;
 public class ConfigurationOrderRepositoryAdapter implements ComplictaionOrderRepository {
 
     private final JpaConfigurationOrderRepository jpaRepository;
-    private final ConfigurationOrderMapper mapper;
 
     @Override
     public void add(ConfigurationOrder order) {
-        ComplictationOrderEntity entity = mapper.toEntity(order);
-        jpaRepository.save(entity);
+        jpaRepository.save(order);
     }
 
     @Override
@@ -33,14 +28,11 @@ public class ConfigurationOrderRepositoryAdapter implements ComplictaionOrderRep
 
     @Override
     public Optional<ConfigurationOrder> findById(UUID orderId) {
-        return jpaRepository.findById(orderId)
-                .map(mapper::toDomain);
+        return jpaRepository.findById(orderId);
     }
 
     @Override
     public List<ConfigurationOrder> getAll() {
-        return jpaRepository.findAll().stream()
-                .map(mapper::toDomain)
-                .toList();
+        return jpaRepository.findAll();
     }
 }

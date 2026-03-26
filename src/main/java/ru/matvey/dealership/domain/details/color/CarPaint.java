@@ -1,34 +1,31 @@
 package ru.matvey.dealership.domain.details.color;
 
-import ru.matvey.dealership.domain.details.Body.BodyType;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import java.util.Set;
+import java.util.UUID;
 import ru.matvey.dealership.domain.details.Cost;
 import ru.matvey.dealership.domain.details.Detail;
 import ru.matvey.dealership.domain.details.DetailType;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+@Entity
+@DiscriminatorValue("COLOR")
+public class CarPaint extends Detail {
 
-public class CarPaint implements Detail {
-    private PaintType type;
-    private Cost cost;
-    private Set<String> compatibleModels;
-
-    private UUID id = UUID.randomUUID();
+    protected CarPaint() {}
 
     public CarPaint(PaintType type, Cost cost, Set<String> compatibleModels) {
-        this.type = type;
-        this.cost = cost;
-        this.compatibleModels = compatibleModels;
+        super(UUID.randomUUID(), type.Value(), cost.value(), compatibleModels);
     }
 
-    public CarPaint(UUID id, PaintType type, Cost cost, Set<String> compatibleModels) {
-        this.id = id;
-        this.type = type;
-        this.cost = cost;
-        this.compatibleModels = compatibleModels;
+    public CarPaint(
+        UUID id,
+        PaintType type,
+        Cost cost,
+        Set<String> compatibleModels
+    ) {
+        super(id, type.Value(), cost.value(), compatibleModels);
     }
-
 
     @Override
     public String Type() {
@@ -37,25 +34,6 @@ public class CarPaint implements Detail {
 
     @Override
     public DetailType Info() {
-        return type;
-    }
-
-    @Override
-    public double Cost() {
-        return cost.value();
-    }
-
-    @Override
-    public boolean isCompatibleWith(String model) {
-        return compatibleModels.contains(model);
-    }
-    @Override
-    public Set<String> CompatibleModels() {
-        return new HashSet<>(compatibleModels);
-    }
-
-    @Override
-    public UUID getId() {
-        return id;
+        return new PaintType(getValue());
     }
 }

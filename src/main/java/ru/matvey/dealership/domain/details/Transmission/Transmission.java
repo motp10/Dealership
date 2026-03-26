@@ -1,28 +1,34 @@
 package ru.matvey.dealership.domain.details.Transmission;
 
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import java.util.Set;
+import java.util.UUID;
 import ru.matvey.dealership.domain.details.Cost;
 import ru.matvey.dealership.domain.details.Detail;
 import ru.matvey.dealership.domain.details.DetailType;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+@Entity
+@DiscriminatorValue("TRANSMISSION")
+public class Transmission extends Detail {
 
-public class Transmission implements Detail {
-    private final TransmissionType type;
-    private final Cost cost;
-    private final Set<String> compatibleModels;
-    private UUID id = UUID.randomUUID();
+    protected Transmission() {}
 
-    public Transmission(TransmissionType type, Cost cost, Set<String> compatibleModels) {
-        this.type = type;
-        this.cost = cost;
-        this.compatibleModels = compatibleModels;
+    public Transmission(
+        TransmissionType type,
+        Cost cost,
+        Set<String> compatibleModels
+    ) {
+        super(UUID.randomUUID(), type.Value(), cost.value(), compatibleModels);
     }
-    public Transmission(UUID id, TransmissionType type, Cost cost, Set<String> compatibleModels) {
-        this.type = type;
-        this.cost = cost;
-        this.compatibleModels = compatibleModels;
+
+    public Transmission(
+        UUID id,
+        TransmissionType type,
+        Cost cost,
+        Set<String> compatibleModels
+    ) {
+        super(id, type.Value(), cost.value(), compatibleModels);
     }
 
     @Override
@@ -32,26 +38,6 @@ public class Transmission implements Detail {
 
     @Override
     public DetailType Info() {
-        return type;
-    }
-
-    @Override
-    public double Cost() {
-        return cost.value();
-    }
-
-    @Override
-    public boolean isCompatibleWith(String model) {
-        return compatibleModels.contains(model);
-    }
-
-    @Override
-    public Set<String> CompatibleModels() {
-        return new HashSet<>(compatibleModels);
-    }
-
-    @Override
-    public UUID getId() {
-        return id;
+        return new TransmissionType(getValue());
     }
 }

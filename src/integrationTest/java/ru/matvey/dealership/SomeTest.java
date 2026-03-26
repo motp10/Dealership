@@ -1,15 +1,17 @@
 package ru.matvey.dealership;
 
+import jakarta.transaction.Transactional;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
-import ru.matvey.dealership.contracts.services.AdminService;
-import ru.matvey.dealership.presentation.models.UserRequest;
+import ru.matvey.dealership.contracts.operations.CarComplictation;
+import ru.matvey.dealership.contracts.operations.DetailOperation;
+import ru.matvey.dealership.contracts.services.DetailService;
+import ru.matvey.dealership.contracts.services.UserService;
+import ru.matvey.dealership.infrastracture.jparepositories.JpaUserRepository;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -18,32 +20,62 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 public class SomeTest extends BaseIntegrationTest {
 
     @Autowired
-    private AdminService adminService;
+    private UserService userService;
+
+    @Autowired
+    private DetailService detailService;
 
     @Test
+    @Transactional
     void addCar_ShouldPersistToDatabase() {
+        UUID id = userService.addUser("mam", "123", "big mom", "CLIENT");
+        userService.deleteUser(id);
+        var users = userRepository.findAll();
+        assertThat(users.size() == 0);
+    }
 
-        // Act
-        UUID id = adminService.addUser("mam", "123", "big mom", "CLIENT");
-        // Assert
-        assertThat(id == id);
+    @Autowired
+    private JpaUserRepository userRepository;
+
+    @Test
+    @Transactional
+    void shouldLoadSeedUsers() {
+        var users = userRepository.findAll();
+        userService.addUser("mam", "123", "big mom", "CLIENT");
+        assertThat(users.size() == 1);
+    }
+    @Test
+    void addCar_ShouldSaveCarToDatabase_WhenDetailsAreCompatible() {
+        String targetModel = "model";
+
+        UUID bodyId = detailService.addDetail(new DetailOperation.Request("body", "body", 10, Set.of(targetModel)));
+        detailService.addDetail(new DetailOperation.Request("fuel", "fuel", 10, Set.of(targetModel)));
+        detailService.addDetail(new DetailOperation.Request("transmission", "transmission", 10, Set.of(targetModel)));
+        detailService.addDetail(new DetailOperation.Request("drivelayout", "drivelayout", 10, Set.of(targetModel)));
+        detailService.addDetail(new DetailOperation.Request("fuel", "fuel", 10, Set.of(targetModel)));
+        detailService.addDetail(new DetailOperation.Request("wheel", "wheel", 10, Set.of(targetModel)));
+        detailService.addDetail(new DetailOperation.Request("interior", "interior", 10, Set.of(targetModel)));
+
+
+        CarComplictation complication = new CarComplictation(
+                1500,
+                "brand",
+                targetModel,
+                "body",
+                "fuel",
+                "transmission",
+                "drive",
+                "color",
+                "wheel"
+        );
+
+        Assertions.assertThat(detailService.getAllDetails().size() == 7);
+        var x = detailService.getDetail(bodyId);
+        assertThat(x.cost() == 10);
     }
 }
 
-//    @Test
-//    void getCar_ShouldReturnData_WhenExists() {
-//        // Arrange
-//        var car = saveNewCar();
-//        var request = new GetCarsRequest();
-//        request.setIds(List.of(car.getId()));
-//
-//        // Act
-//        ResponseEntity<?> response = carHandler.getCars(request);
-//
-//        // Assert
-//        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-//        assertThat(response.getBody()).isNotNull();
-//    }
+
 //
 //    @Test
 //    void updateCar_ShouldModifyDatabase() {

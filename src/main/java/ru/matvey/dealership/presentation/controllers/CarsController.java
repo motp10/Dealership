@@ -4,17 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.matvey.dealership.contracts.models.CarDto;
 import ru.matvey.dealership.contracts.operations.CarComplictation;
-import ru.matvey.dealership.contracts.services.AdminService;
+import ru.matvey.dealership.contracts.services.CarService;
 import ru.matvey.dealership.presentation.models.CarConfigurationRequest;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/cars")
+@RequestMapping("/api/cars")
 @RequiredArgsConstructor
 public class CarsController {
-    private final AdminService adminService;
+    private final CarService adminService;
 
     @PostMapping
     public UUID addCar(@RequestBody CarConfigurationRequest request) {

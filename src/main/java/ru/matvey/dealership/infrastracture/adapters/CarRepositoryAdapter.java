@@ -12,9 +12,7 @@ import ru.matvey.dealership.domain.details.Wheel.WheelType;
 import ru.matvey.dealership.domain.details.color.PaintType;
 import ru.matvey.dealership.domain.details.drivelayout.DriveLayoutType;
 import ru.matvey.dealership.domain.details.fuel.FuelType;
-import ru.matvey.dealership.infrastracture.jpa.CarEntity;
 import ru.matvey.dealership.infrastracture.jparepositories.JpaCarRepository;
-import ru.matvey.dealership.infrastracture.mappers.carMapper.CarMapper;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,12 +22,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CarRepositoryAdapter implements CarsRepository {
     private final JpaCarRepository jpaCarRepository;
-    private final CarMapper carMapper;
 
     @Override
     public void add(Car car) {
-        CarEntity entity = carMapper.toEntity(car);
-        jpaCarRepository.save(entity);
+        jpaCarRepository.save(car);
     }
 
     @Override
@@ -39,15 +35,12 @@ public class CarRepositoryAdapter implements CarsRepository {
 
     @Override
     public Optional<Car> findById(UUID id) {
-        return jpaCarRepository.findById(id)
-                .map(carMapper::toDomain);
+        return jpaCarRepository.findById(id);
     }
 
     @Override
     public List<Car> getAll() {
-        return jpaCarRepository.findAll().stream()
-                .map(carMapper::toDomain)
-                .toList();
+        return jpaCarRepository.findAll();
     }
 
     @Override
@@ -55,7 +48,7 @@ public class CarRepositoryAdapter implements CarsRepository {
                                     FuelType fuelType, TransmissionType transmissionType,
                                     DriveLayoutType drivelayoutType, PaintType color, WheelType wheel) {
 
-        Specification<CarEntity> spec = Specification.where((Specification<CarEntity>) null);
+        Specification<Car> spec = Specification.where((Specification<Car>) null);
 
         if (maxPrice != null) spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("baseCost"), maxPrice.value()));
         if (brand != null) spec = spec.and((root, query, cb) -> cb.equal(root.get("brand"), brand));
@@ -65,8 +58,6 @@ public class CarRepositoryAdapter implements CarsRepository {
         if (fuelType != null) spec = spec.and((root, query, cb) -> cb.equal(root.get("fuel"), fuelType.value()));
         if (transmissionType != null) spec = spec.and((root, query, cb) -> cb.equal(root.get("fuel"), transmissionType.value()));
 
-        return jpaCarRepository.findAll(spec).stream()
-                .map(carMapper::toDomain)
-                .toList();
+        return jpaCarRepository.findAll(spec);
     }
 }

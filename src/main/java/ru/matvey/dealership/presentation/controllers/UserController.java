@@ -2,7 +2,7 @@ package ru.matvey.dealership.presentation.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.matvey.dealership.contracts.services.AdminService;
+import ru.matvey.dealership.contracts.services.UserService;
 import ru.matvey.dealership.presentation.models.UserRequest;
 
 import java.util.UUID;
@@ -11,15 +11,15 @@ import java.util.UUID;
 @RequestMapping("api/users")
 @RequiredArgsConstructor
 public class UserController {
-    private final AdminService adminService;
+    private final UserService userService;
 
     @PostMapping
     public UUID addUser(@RequestBody UserRequest request) {
-        return adminService.addUser(request.name(), request.password(), request.FullName(), request.Role());
+        return userService.addUser(request.name(), request.password(), request.FullName(), request.Role());
     }
 
     @DeleteMapping
     public void deleteUser(@RequestBody UUID id) {
-        adminService.deleteUser(id);
+        userService.deleteUser(id);
     }
 }

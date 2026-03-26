@@ -4,8 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.matvey.dealership.contracts.models.DetailDto;
 import ru.matvey.dealership.contracts.operations.DetailOperation;
-import ru.matvey.dealership.contracts.services.AdminService;
-import ru.matvey.dealership.contracts.services.ClientService;
+import ru.matvey.dealership.contracts.services.DetailService;
 import ru.matvey.dealership.presentation.models.DetailOperationRequest;
 
 import java.util.UUID;
@@ -14,8 +13,7 @@ import java.util.UUID;
 @RequestMapping("api/details")
 @RequiredArgsConstructor
 public class DetailController {
-    private final AdminService adminService;
-    private final ClientService clientService;
+    private final DetailService detailService;
 
     @PostMapping
     public UUID addDetail(@RequestBody DetailOperationRequest request) {
@@ -25,7 +23,7 @@ public class DetailController {
                 request.cost,
                 request.compatitiveModels
         );
-        return adminService.addDetail(detail);
+        return detailService.addDetail(detail);
     }
     @PatchMapping
     public void updateDetail(@RequestBody DetailOperationRequest request) {
@@ -35,18 +33,18 @@ public class DetailController {
                 request.cost,
                 request.compatitiveModels
         );
-        adminService.updateDetail(request.id, detail);
+        detailService.updateDetail(request.id, detail);
     }
     @DeleteMapping
     public void deleteDetail(@RequestBody UUID id) {
-        adminService.deleteDetail(id);
+        detailService.deleteDetail(id);
     }
     @GetMapping("/{id}")
     public DetailDto getDetail(@RequestBody UUID id) {
-        return adminService.getDetail(id);
+        return detailService.getDetail(id);
     }
     @GetMapping
     public void getAllDetails() {
-        adminService.getAllDetails();
+        detailService.getAllDetails();
     }
 }

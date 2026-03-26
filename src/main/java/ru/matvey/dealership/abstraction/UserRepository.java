@@ -14,8 +14,7 @@ public interface UserRepository {
 
     List<User> getAll();
 
-    <T extends User>
-    List<T> findByRole(Class<T> userClass);
+    List<User> findByRole(String role);
 
     UUID getRandomManager();
 }

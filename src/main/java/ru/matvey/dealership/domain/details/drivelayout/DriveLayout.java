@@ -1,29 +1,34 @@
 package ru.matvey.dealership.domain.details.drivelayout;
 
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import java.util.Set;
+import java.util.UUID;
 import ru.matvey.dealership.domain.details.Cost;
 import ru.matvey.dealership.domain.details.Detail;
 import ru.matvey.dealership.domain.details.DetailType;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+@Entity
+@DiscriminatorValue("DRIVELAYOUT")
+public class DriveLayout extends Detail {
 
-public class DriveLayout implements Detail {
-    private final DriveLayoutType type;
-    private final Cost cost;
-    private final Set<String> compatibleModels;
-    private UUID id = UUID.randomUUID();
-    public DriveLayout(DriveLayoutType type, Cost cost, Set<String> compatibleModels) {
-        this.type = type;
-        this.cost = cost;
-        this.compatibleModels = compatibleModels;
+    protected DriveLayout() {}
+
+    public DriveLayout(
+        DriveLayoutType type,
+        Cost cost,
+        Set<String> compatibleModels
+    ) {
+        super(UUID.randomUUID(), type.Value(), cost.value(), compatibleModels);
     }
 
-    public DriveLayout(UUID id, DriveLayoutType type, Cost cost, Set<String> compatibleModels) {
-        this.id = id;
-        this.type = type;
-        this.cost = cost;
-        this.compatibleModels = compatibleModels;
+    public DriveLayout(
+        UUID id,
+        DriveLayoutType type,
+        Cost cost,
+        Set<String> compatibleModels
+    ) {
+        super(id, type.Value(), cost.value(), compatibleModels);
     }
 
     @Override
@@ -33,25 +38,6 @@ public class DriveLayout implements Detail {
 
     @Override
     public DetailType Info() {
-        return type;
-    }
-
-    @Override
-    public double Cost() {
-        return cost.value();
-    }
-
-    @Override
-    public boolean isCompatibleWith(String model) {
-        return compatibleModels.contains(model);
-    }
-    @Override
-    public Set<String> CompatibleModels() {
-        return new HashSet<>(compatibleModels);
-    }
-
-    @Override
-    public UUID getId() {
-        return id;
+        return new DriveLayoutType(getValue());
     }
 }

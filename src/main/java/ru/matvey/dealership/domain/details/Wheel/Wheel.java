@@ -1,28 +1,30 @@
 package ru.matvey.dealership.domain.details.Wheel;
 
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import java.util.Set;
+import java.util.UUID;
 import ru.matvey.dealership.domain.details.Cost;
 import ru.matvey.dealership.domain.details.Detail;
 import ru.matvey.dealership.domain.details.DetailType;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+@Entity
+@DiscriminatorValue("WHEEL")
+public class Wheel extends Detail {
 
-public class Wheel implements Detail {
-    private final WheelType type;
-    private final Cost cost;
-    private final Set<String> compatibleModels;
-    private UUID id = UUID.randomUUID();
+    protected Wheel() {}
 
     public Wheel(WheelType type, Cost cost, Set<String> compatibleModels) {
-        this.type = type;
-        this.cost = cost;
-        this.compatibleModels = compatibleModels;
+        super(UUID.randomUUID(), type.Value(), cost.value(), compatibleModels);
     }
-    public Wheel(UUID id, WheelType type, Cost cost, Set<String> compatibleModels) {
-        this.type = type;
-        this.cost = cost;
-        this.compatibleModels = compatibleModels;
+
+    public Wheel(
+        UUID id,
+        WheelType type,
+        Cost cost,
+        Set<String> compatibleModels
+    ) {
+        super(id, type.Value(), cost.value(), compatibleModels);
     }
 
     @Override
@@ -32,26 +34,6 @@ public class Wheel implements Detail {
 
     @Override
     public DetailType Info() {
-        return type;
-    }
-
-    @Override
-    public double Cost() {
-        return cost.value();
-    }
-
-    @Override
-    public boolean isCompatibleWith(String model) {
-        return compatibleModels.contains(model);
-    }
-
-    @Override
-    public Set<String> CompatibleModels() {
-        return new HashSet<>(compatibleModels);
-    }
-
-    @Override
-    public UUID getId() {
-        return id;
+        return new WheelType(getValue());
     }
 }

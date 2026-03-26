@@ -1,94 +1,174 @@
 package ru.matvey.dealership.domain.car;
 
-import lombok.NonNull;
-import ru.matvey.dealership.domain.exceptions.DomainValidationException;
-import ru.matvey.dealership.domain.exceptions.IncompatibleComponentException;
+import jakarta.persistence.*;
+import java.time.Instant;
+import java.util.UUID;
+import lombok.Getter;
 import ru.matvey.dealership.domain.details.Body.Body;
 import ru.matvey.dealership.domain.details.Cost;
-import ru.matvey.dealership.domain.details.Detail;
 import ru.matvey.dealership.domain.details.Transmission.Transmission;
-import lombok.Builder;
-import lombok.Getter;
 import ru.matvey.dealership.domain.details.color.CarPaint;
 import ru.matvey.dealership.domain.details.drivelayout.DriveLayout;
 import ru.matvey.dealership.domain.details.fuel.Fuel;
+import ru.matvey.dealership.domain.exceptions.DomainValidationException;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Collections;
-import java.util.UUID;
-@Builder
+@Entity
+@Table(name = "cars")
 @Getter
 public class Car {
-    private UUID id;
-    private String brand;
-    private String model;
-    @NonNull private Body body;
-    @NonNull private CarPaint carPaint;
-    @NonNull private Fuel fuel;
-    @NonNull private Transmission transmission;
-    @NonNull private DriveLayout drivelayout;
-    @NonNull private Cost defaultCost;
-    public Car(@NonNull String brand,
-               @NonNull String model,
-               @NonNull Body bodyType,
-               @NonNull CarPaint color,
-               @NonNull Fuel fuelType,
-               @NonNull Transmission transmissionType,
-               @NonNull DriveLayout driveType,
-               @NonNull Cost defaultCost) {
-        if (!bodyType.isCompatibleWith(model)) throw new DomainValidationException("body is not compatible with model");
-        if (!color.isCompatibleWith(model)) throw new DomainValidationException("color is not compatible with model");
-        if (!fuelType.isCompatibleWith(model)) throw new DomainValidationException("fuel is not compatible with model");
-        if (!transmissionType.isCompatibleWith(model)) throw new DomainValidationException("transmission is not compatible with model");
-        if (!driveType.isCompatibleWith(model)) throw new DomainValidationException("drivelayout is not compatible with model");
 
+    @Id
+    @Column(updatable = false, nullable = false)
+    private UUID id;
+
+    @Column(name = "brand")
+    private String brand;
+
+    @Column(name = "model")
+    private String model;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "body_id")
+    private Body body;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "color_id")
+    private CarPaint carPaint;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fuel_id")
+    private Fuel fuel;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "transmission_id")
+    private Transmission transmission;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "drive_layout_id")
+    private DriveLayout drivelayout;
+
+    @Column(name = "base_cost")
+    private double baseCost;
+
+    @Column(name = "created_at", updatable = false)
+    private Instant createdAt;
+
+    @Column(name = "updated_at")
+    private Instant updatedAt;
+
+    @Column(name = "removed")
+    private final boolean removed = false;
+
+    protected Car() {}
+
+    public Car(
+        String brand,
+        String model,
+        Body body,
+        CarPaint carPaint,
+        Fuel fuel,
+        Transmission transmission,
+        DriveLayout drivelayout,
+        Cost defaultCost
+    ) {
+        if (!body.isCompatibleWith(model)) throw new DomainValidationException(
+            "body is not compatible with model"
+        );
+        if (
+            !carPaint.isCompatibleWith(model)
+        ) throw new DomainValidationException(
+            "color is not compatible with model"
+        );
+        if (!fuel.isCompatibleWith(model)) throw new DomainValidationException(
+            "fuel is not compatible with model"
+        );
+        if (
+            !transmission.isCompatibleWith(model)
+        ) throw new DomainValidationException(
+            "transmission is not compatible with model"
+        );
+        if (
+            !drivelayout.isCompatibleWith(model)
+        ) throw new DomainValidationException(
+            "drivelayout is not compatible with model"
+        );
         this.id = UUID.randomUUID();
         this.brand = brand;
         this.model = model;
-        this.body = bodyType;
-        this.carPaint = color;
-        this.fuel = fuelType;
-        this.transmission = transmissionType;
-        this.drivelayout = driveType;
-        this.defaultCost = defaultCost;
+        this.body = body;
+        this.carPaint = carPaint;
+        this.fuel = fuel;
+        this.transmission = transmission;
+        this.drivelayout = drivelayout;
+        this.baseCost = defaultCost.value();
     }
 
-    public Car(UUID id,
-               @NonNull String brand,
-               @NonNull String model,
-               @NonNull Body bodyType,
-               @NonNull CarPaint color,
-               @NonNull Fuel fuelType,
-               @NonNull Transmission transmissionType,
-               @NonNull DriveLayout driveType,
-               @NonNull Cost defaultCost) {
-
-        if (!bodyType.isCompatibleWith(model)) throw new DomainValidationException("body is not compatible with model");
-        if (!color.isCompatibleWith(model)) throw new DomainValidationException("color is not compatible with model");
-        if (!fuelType.isCompatibleWith(model)) throw new DomainValidationException("fuel is not compatible with model");
-        if (!transmissionType.isCompatibleWith(model)) throw new DomainValidationException("transmission is not compatible with model");
-        if (!driveType.isCompatibleWith(model)) throw new DomainValidationException("drivelayout is not compatible with model");
-
+    public Car(
+        UUID id,
+        String brand,
+        String model,
+        Body body,
+        CarPaint carPaint,
+        Fuel fuel,
+        Transmission transmission,
+        DriveLayout drivelayout,
+        Cost defaultCost
+    ) {
+        if (!body.isCompatibleWith(model)) throw new DomainValidationException(
+            "body is not compatible with model"
+        );
+        if (
+            !carPaint.isCompatibleWith(model)
+        ) throw new DomainValidationException(
+            "color is not compatible with model"
+        );
+        if (!fuel.isCompatibleWith(model)) throw new DomainValidationException(
+            "fuel is not compatible with model"
+        );
+        if (
+            !transmission.isCompatibleWith(model)
+        ) throw new DomainValidationException(
+            "transmission is not compatible with model"
+        );
+        if (
+            !drivelayout.isCompatibleWith(model)
+        ) throw new DomainValidationException(
+            "drivelayout is not compatible with model"
+        );
         this.id = id;
         this.brand = brand;
         this.model = model;
-        this.body = bodyType;
-        this.carPaint = color;
-        this.fuel = fuelType;
-        this.transmission = transmissionType;
-        this.drivelayout = driveType;
-        this.defaultCost = defaultCost;
+        this.body = body;
+        this.carPaint = carPaint;
+        this.fuel = fuel;
+        this.transmission = transmission;
+        this.drivelayout = drivelayout;
+        this.baseCost = defaultCost.value();
     }
 
     public double getTotalPrice() {
-        double totalSum = 0;
-        totalSum += body.Cost();
-        totalSum += carPaint.Cost();
-        totalSum += fuel.Cost();
-        totalSum += transmission.Cost();
-        totalSum += drivelayout.Cost();
-        totalSum += defaultCost.value();
-        return totalSum;
+        return (
+            baseCost +
+            body.Cost() +
+            carPaint.Cost() +
+            fuel.Cost() +
+            transmission.Cost() +
+            drivelayout.Cost()
+        );
+    }
+
+    public Cost getDefaultCost() {
+        return new Cost(baseCost);
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = Instant.now();
+        updatedAt = Instant.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = Instant.now();
     }
 }
