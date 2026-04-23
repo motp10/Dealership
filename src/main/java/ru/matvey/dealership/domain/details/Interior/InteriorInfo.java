@@ -1,15 +1,15 @@
 package ru.matvey.dealership.domain.details.Interior;
 
-import ru.matvey.dealership.domain.details.DetailType;
+import ru.matvey.dealership.domain.details.DetailInfo;
 
-public record InteriorType(String value) implements DetailType {
+public record InteriorInfo(String value) implements DetailInfo {
 
     @Override
     public String Value() {
         return value;
     }
 
-    public InteriorType {
+    public InteriorInfo {
         if (value == null || value.trim().isEmpty()) {
             throw new IllegalArgumentException("Interior type cannot be empty");
         }

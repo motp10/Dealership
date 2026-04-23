@@ -1,5 +1,5 @@
 package ru.matvey.dealership.domain.details;
 
-public interface DetailType {
+public interface DetailInfo {
     String Value();
 }

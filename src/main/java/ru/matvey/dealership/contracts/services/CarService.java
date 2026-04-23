@@ -13,10 +13,10 @@ public interface CarService {
     void updateCar(UUID id, CarComplictation complictation);
 
     void deleteCar(UUID id);
-
-    CarDto getCar(UUID id);
+    CarDto getCar(UUID id, UUID clientId);
 
     List<CarDto> getCars(CarComplictation filter);
 
     List<CarDto> getAllCars();
+
 }

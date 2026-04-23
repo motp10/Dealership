@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 import ru.matvey.dealership.domain.details.Cost;
 import ru.matvey.dealership.domain.details.Detail;
-import ru.matvey.dealership.domain.details.DetailType;
+import ru.matvey.dealership.domain.details.DetailInfo;
 
 @Entity
 @DiscriminatorValue("TRANSMISSION")
@@ -15,7 +15,7 @@ public class Transmission extends Detail {
     protected Transmission() {}
 
     public Transmission(
-        TransmissionType type,
+        TransmissionInfo type,
         Cost cost,
         Set<String> compatibleModels
     ) {
@@ -24,7 +24,7 @@ public class Transmission extends Detail {
 
     public Transmission(
         UUID id,
-        TransmissionType type,
+        TransmissionInfo type,
         Cost cost,
         Set<String> compatibleModels
     ) {
@@ -37,7 +37,7 @@ public class Transmission extends Detail {
     }
 
     @Override
-    public DetailType Info() {
-        return new TransmissionType(getValue());
+    public DetailInfo Info() {
+        return new TransmissionInfo(getInfo());
     }
 }

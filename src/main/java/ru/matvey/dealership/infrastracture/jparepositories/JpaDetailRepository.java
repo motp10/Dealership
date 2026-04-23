@@ -11,7 +11,7 @@ import ru.matvey.dealership.domain.details.Detail;
 @Repository
 public interface JpaDetailRepository extends JpaRepository<Detail, UUID> {
     @Query(
-        value = "SELECT * FROM details WHERE type = :type AND removed = false",
+        value = "SELECT * FROM details WHERE type = :type",
         nativeQuery = true
     )
     List<Detail> findByType(@Param("type") String type);

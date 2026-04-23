@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 import ru.matvey.dealership.domain.details.Cost;
 import ru.matvey.dealership.domain.details.Detail;
-import ru.matvey.dealership.domain.details.DetailType;
+import ru.matvey.dealership.domain.details.DetailInfo;
 
 @Entity
 @DiscriminatorValue("DRIVELAYOUT")
@@ -15,7 +15,7 @@ public class DriveLayout extends Detail {
     protected DriveLayout() {}
 
     public DriveLayout(
-        DriveLayoutType type,
+        DriveLayoutInfo type,
         Cost cost,
         Set<String> compatibleModels
     ) {
@@ -24,7 +24,7 @@ public class DriveLayout extends Detail {
 
     public DriveLayout(
         UUID id,
-        DriveLayoutType type,
+        DriveLayoutInfo type,
         Cost cost,
         Set<String> compatibleModels
     ) {
@@ -37,7 +37,7 @@ public class DriveLayout extends Detail {
     }
 
     @Override
-    public DetailType Info() {
-        return new DriveLayoutType(getValue());
+    public DetailInfo Info() {
+        return new DriveLayoutInfo(getInfo());
     }
 }

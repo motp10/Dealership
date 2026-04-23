@@ -9,24 +9,25 @@ import java.util.List;
 import java.util.UUID;
 
 public interface OrderService {
-    UUID makeStockCarOrder(MakeOrder.Request request);
+    UUID makeStockCarOrder(UUID carID, UUID clientId);
 
-    UUID makeTestDriveOrder(MakeOrder.Request request);
-    UUID makeOrderWithConfiguration(CarComplictation complictation, UUID id);
+    UUID makeTestDriveOrder(UUID carID, UUID clientId);
 
-    ConfigurationOrderDto getConfigurationOrder(UUID id);
+    UUID makeOrderWithConfiguration(CarComplictation complictation, UUID clientId);
+
+    ConfigurationOrderDto getConfigurationOrder(UUID id, UUID clientId);
 
     List<ConfigurationOrderDto> getAllConfigurationOrders();
 
-    OrderDto getStockCarOrder(UUID id);
+    OrderDto getStockCarOrder(UUID id, UUID clientId);
 
     List<OrderDto> getAllStockCarOrders();
 
-    OrderDto getTestDriveOrder(UUID id);
+    OrderDto getTestDriveOrder(UUID id, UUID clientId);
 
     List<OrderDto> getAllTestDriveOrders();
 
     void updateOrderStatus(UUID id);
 
-    void cancelOrder(UUID id);
+    void cancelOrder(UUID id, UUID clientId);
 }

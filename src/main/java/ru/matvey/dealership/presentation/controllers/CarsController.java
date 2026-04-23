@@ -1,6 +1,7 @@
 package ru.matvey.dealership.presentation.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import ru.matvey.dealership.contracts.models.CarDto;
 import ru.matvey.dealership.contracts.operations.CarComplictation;
@@ -14,7 +15,7 @@ import java.util.UUID;
 @RequestMapping("/api/cars")
 @RequiredArgsConstructor
 public class CarsController {
-    private final CarService adminService;
+    private final CarService carService;
 
     @PostMapping
     public UUID addCar(@RequestBody CarConfigurationRequest request) {
@@ -28,7 +29,7 @@ public class CarsController {
                 request.driveLayout(),
                 request.paint(),
                 request.wheel());
-        return adminService.addCar(complictation);
+        return carService.addCar(complictation);
     }
     @PatchMapping
     public void updateCar(@RequestBody CarConfigurationRequest request) {
@@ -42,18 +43,23 @@ public class CarsController {
                 request.driveLayout(),
                 request.paint(),
                 request.wheel());
-        adminService.updateCar(request.clientId(), complictation);
+        carService.updateCar(request.carID(), complictation);
     }
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public void deleteCar(@PathVariable UUID id) {
-        adminService.deleteCar(id);
+        carService.deleteCar(id);
     }
     @GetMapping("/{id}")
-    public CarDto getCar(@PathVariable UUID id) {
-        return adminService.getCar(id);
+    public CarDto getCar(@PathVariable UUID id, JwtAuthenticationToken auth) {
+        UUID clientId = UUID.fromString(auth.getToken().getSubject());
+        return carService.getCar(id, clientId);
     }
-    @GetMapping
-    public List<CarDto> getCars(@RequestBody CarConfigurationRequest request) {
+
+    @PostMapping("/search")
+    public List<CarDto> getCars(@RequestBody(required = false) CarConfigurationRequest request) {
+        if (request == null) {
+            return carService.getAllCars();
+        }
         CarComplictation complictation = new CarComplictation(
                 0,
                 request.brand(),
@@ -64,7 +70,6 @@ public class CarsController {
                 request.driveLayout(),
                 request.paint(),
                 request.wheel());
-        if (complictation == CarComplictation.empty()) return adminService.getAllCars();
-        return adminService.getCars(complictation);
+        return carService.getCars(complictation);
     }
 }

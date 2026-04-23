@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.matvey.dealership.abstraction.DetailsRepository;
 import ru.matvey.dealership.domain.details.Detail;
-import ru.matvey.dealership.domain.details.DetailType;
+import ru.matvey.dealership.domain.details.DetailInfo;
 import ru.matvey.dealership.infrastracture.jparepositories.JpaDetailRepository;
 
 import java.util.List;
@@ -33,8 +33,8 @@ public class DetailsRepositoryAdapter implements DetailsRepository {
     }
 
     @Override
-    public List<Detail> getDetails(DetailType type) {
-        return jpaDetailRepository.findByType(type.Value().toLowerCase());
+    public List<Detail> getDetails(String type) {
+        return jpaDetailRepository.findByType(type.toUpperCase());
     }
 
     @Override

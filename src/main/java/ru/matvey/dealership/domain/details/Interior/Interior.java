@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 import ru.matvey.dealership.domain.details.Cost;
 import ru.matvey.dealership.domain.details.Detail;
-import ru.matvey.dealership.domain.details.DetailType;
+import ru.matvey.dealership.domain.details.DetailInfo;
 
 @Entity
 @DiscriminatorValue("INTERIOR")
@@ -15,7 +15,7 @@ public class Interior extends Detail {
     protected Interior() {}
 
     public Interior(
-        InteriorType type,
+        InteriorInfo type,
         Cost cost,
         Set<String> compatibleModels
     ) {
@@ -24,7 +24,7 @@ public class Interior extends Detail {
 
     public Interior(
         UUID id,
-        InteriorType type,
+        InteriorInfo type,
         Cost cost,
         Set<String> compatibleModels
     ) {
@@ -37,7 +37,7 @@ public class Interior extends Detail {
     }
 
     @Override
-    public DetailType Info() {
-        return new InteriorType(getValue());
+    public DetailInfo Info() {
+        return new InteriorInfo(getInfo());
     }
 }

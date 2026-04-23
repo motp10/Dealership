@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 import ru.matvey.dealership.domain.details.Cost;
 import ru.matvey.dealership.domain.details.Detail;
-import ru.matvey.dealership.domain.details.DetailType;
+import ru.matvey.dealership.domain.details.DetailInfo;
 
 @Entity
 @DiscriminatorValue("BODY")
@@ -14,13 +14,13 @@ public class Body extends Detail {
 
     protected Body() {}
 
-    public Body(BodyType type, Cost cost, Set<String> compatibleModels) {
+    public Body(BodyInfo type, Cost cost, Set<String> compatibleModels) {
         super(UUID.randomUUID(), type.Value(), cost.value(), compatibleModels);
     }
 
     public Body(
         UUID id,
-        BodyType type,
+        BodyInfo type,
         Cost cost,
         Set<String> compatibleModels
     ) {
@@ -33,7 +33,7 @@ public class Body extends Detail {
     }
 
     @Override
-    public DetailType Info() {
-        return new BodyType(getValue());
+    public DetailInfo Info() {
+        return new BodyInfo(getInfo());
     }
 }

@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 import ru.matvey.dealership.domain.details.Cost;
 import ru.matvey.dealership.domain.details.Detail;
-import ru.matvey.dealership.domain.details.DetailType;
+import ru.matvey.dealership.domain.details.DetailInfo;
 
 @Entity
 @DiscriminatorValue("FUEL")
@@ -14,13 +14,13 @@ public class Fuel extends Detail {
 
     protected Fuel() {}
 
-    public Fuel(FuelType type, Cost cost, Set<String> compatibleModels) {
+    public Fuel(FuelInfo type, Cost cost, Set<String> compatibleModels) {
         super(UUID.randomUUID(), type.Value(), cost.value(), compatibleModels);
     }
 
     public Fuel(
         UUID id,
-        FuelType type,
+        FuelInfo type,
         Cost cost,
         Set<String> compatibleModels
     ) {
@@ -33,7 +33,7 @@ public class Fuel extends Detail {
     }
 
     @Override
-    public DetailType Info() {
-        return new FuelType(getValue());
+    public DetailInfo Info() {
+        return new FuelInfo(getInfo());
     }
 }

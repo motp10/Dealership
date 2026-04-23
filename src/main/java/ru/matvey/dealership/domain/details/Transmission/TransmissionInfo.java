@@ -1,14 +1,15 @@
-package ru.matvey.dealership.domain.details.SteeringWheel;
+package ru.matvey.dealership.domain.details.Transmission;
 
-import ru.matvey.dealership.domain.details.DetailType;
+import ru.matvey.dealership.domain.details.DetailInfo;
 
-public record SteeringWheelType(String value) implements DetailType {
+public record TransmissionInfo(String value) implements DetailInfo {
+
     @Override
     public String Value() {
         return value;
     }
 
-    public SteeringWheelType {
+    public TransmissionInfo {
         if (value == null || value.trim().isEmpty()) {
             throw new IllegalArgumentException("Transmission type cannot be empty");
         }

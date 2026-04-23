@@ -1,11 +1,10 @@
 package ru.matvey.dealership.presentation.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import ru.matvey.dealership.contracts.models.OrderDto;
-import ru.matvey.dealership.contracts.operations.MakeOrder;
 import ru.matvey.dealership.contracts.services.OrderService;
-import ru.matvey.dealership.presentation.models.MakeOrderRequest;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,21 +16,23 @@ public class TestDriveOrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public UUID makeOrder(@RequestBody MakeOrderRequest request) {
-        MakeOrder.Request orderRequest = new MakeOrder.Request(request.clientId(), request.carId());
-        return orderService.makeTestDriveOrder(orderRequest);
+    public UUID makeOrder(@PathVariable UUID carId, JwtAuthenticationToken auth) {
+        UUID clientId = UUID.fromString(auth.getToken().getSubject());
+        return orderService.makeTestDriveOrder(carId, clientId);
     }
     @PatchMapping("/update")
     public void updateOrderStatus(@RequestBody UUID id) {
         orderService.updateOrderStatus(id);
     }
     @PatchMapping("/cancel")
-    public void cancelOrder(@RequestBody UUID id) {
-        orderService.cancelOrder(id);
+    public void cancelOrder(@RequestBody UUID id, JwtAuthenticationToken auth) {
+        UUID clientId = UUID.fromString(auth.getToken().getSubject());
+        orderService.cancelOrder(id, clientId);
     }
     @GetMapping("/{id}")
-    public OrderDto getOrder(@RequestBody UUID id) {
-        return orderService.getTestDriveOrder(id);
+    public OrderDto getOrder(@RequestBody UUID id, JwtAuthenticationToken auth) {
+        UUID clientId = UUID.fromString(auth.getToken().getSubject());
+        return orderService.getTestDriveOrder(id, clientId);
     }
     @GetMapping
     public List<OrderDto> getAllOrders() {

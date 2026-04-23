@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 import ru.matvey.dealership.domain.details.Cost;
 import ru.matvey.dealership.domain.details.Detail;
-import ru.matvey.dealership.domain.details.DetailType;
+import ru.matvey.dealership.domain.details.DetailInfo;
 
 @Entity
 @DiscriminatorValue("STEERINGWHEEL")
@@ -15,7 +15,7 @@ public class SteeringWheel extends Detail {
     protected SteeringWheel() {}
 
     public SteeringWheel(
-        SteeringWheelType type,
+        SteeringWheelInfo type,
         Cost cost,
         Set<String> compatibleModels
     ) {
@@ -24,7 +24,7 @@ public class SteeringWheel extends Detail {
 
     public SteeringWheel(
         UUID id,
-        SteeringWheelType type,
+        SteeringWheelInfo type,
         Cost cost,
         Set<String> compatibleModels
     ) {
@@ -37,7 +37,7 @@ public class SteeringWheel extends Detail {
     }
 
     @Override
-    public DetailType Info() {
-        return new SteeringWheelType(getValue());
+    public DetailInfo Info() {
+        return new SteeringWheelInfo(getInfo());
     }
 }

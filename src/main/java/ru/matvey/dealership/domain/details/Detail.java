@@ -21,14 +21,11 @@ public abstract class Detail {
     @Column(updatable = false, nullable = false)
     private UUID id;
 
-    @Column(name = "value", nullable = false)
-    private String value;
+    @Column(name = "detail_info", nullable = false)
+    private String info;
 
     @Column(name = "cost", nullable = false)
     private double cost;
-
-    @Column(name = "type", insertable = false, updatable = false)
-    private String type;
 
     @ElementCollection
     @CollectionTable(
@@ -56,7 +53,7 @@ public abstract class Detail {
         Set<String> compatibleModels
     ) {
         this.id = id;
-        this.value = value;
+        this.info = value;
         this.cost = cost;
         this.compatibleModels = new HashSet<>(compatibleModels);
     }
@@ -72,7 +69,7 @@ public abstract class Detail {
         updatedAt = Instant.now();
     }
 
-    public abstract DetailType Info();
+    public abstract DetailInfo Info();
 
     public abstract String Type();
 

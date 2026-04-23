@@ -5,13 +5,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 import ru.matvey.dealership.abstraction.CarsRepository;
 import ru.matvey.dealership.domain.car.Car;
-import ru.matvey.dealership.domain.details.Body.BodyType;
+import ru.matvey.dealership.domain.details.Body.BodyInfo;
 import ru.matvey.dealership.domain.details.Cost;
-import ru.matvey.dealership.domain.details.Transmission.TransmissionType;
-import ru.matvey.dealership.domain.details.Wheel.WheelType;
-import ru.matvey.dealership.domain.details.color.PaintType;
-import ru.matvey.dealership.domain.details.drivelayout.DriveLayoutType;
-import ru.matvey.dealership.domain.details.fuel.FuelType;
+import ru.matvey.dealership.domain.details.Transmission.TransmissionInfo;
+import ru.matvey.dealership.domain.details.Wheel.WheelInfo;
+import ru.matvey.dealership.domain.details.color.PaintInfo;
+import ru.matvey.dealership.domain.details.drivelayout.DriveLayoutInfo;
+import ru.matvey.dealership.domain.details.fuel.FuelInfo;
 import ru.matvey.dealership.infrastracture.jparepositories.JpaCarRepository;
 
 import java.util.List;
@@ -44,19 +44,25 @@ public class CarRepositoryAdapter implements CarsRepository {
     }
 
     @Override
-    public List<Car> findByCriteria(Cost maxPrice, String brand, String model, BodyType bodyType,
-                                    FuelType fuelType, TransmissionType transmissionType,
-                                    DriveLayoutType drivelayoutType, PaintType color, WheelType wheel) {
+    public List<Car> findByCriteria(Cost maxPrice, String brand, String model, BodyInfo bodyType,
+                                    FuelInfo fuelType, TransmissionInfo transmissionType,
+                                    DriveLayoutInfo drivelayoutType, PaintInfo color, WheelInfo wheel) {
 
-        Specification<Car> spec = Specification.where((Specification<Car>) null);
+        Specification<Car> spec = Specification.where(null);
 
         if (maxPrice != null) spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("baseCost"), maxPrice.value()));
         if (brand != null) spec = spec.and((root, query, cb) -> cb.equal(root.get("brand"), brand));
         if (model != null) spec = spec.and((root, query, cb) -> cb.equal(root.get("model"), model));
-        if (bodyType != null) spec = spec.and((root, query, cb) -> cb.equal(root.join("body").get("value"), bodyType.Value()));
-        if (color != null) spec = spec.and((root, query, cb) -> cb.equal(root.join("color").get("value"), color.Value()));
-        if (fuelType != null) spec = spec.and((root, query, cb) -> cb.equal(root.get("fuel"), fuelType.value()));
-        if (transmissionType != null) spec = spec.and((root, query, cb) -> cb.equal(root.get("fuel"), transmissionType.value()));
+
+        if (bodyType != null) spec = spec.and((root, query, cb) -> cb.equal(root.get("body").get("info"), bodyType.Value()));
+
+        if (color != null) spec = spec.and((root, query, cb) -> cb.equal(root.get("carPaint").get("info"), color.Value()));
+
+        if (fuelType != null) spec = spec.and((root, query, cb) -> cb.equal(root.get("fuel").get("info"), fuelType.Value()));
+
+        if (transmissionType != null) spec = spec.and((root, query, cb) -> cb.equal(root.get("transmission").get("info"), transmissionType.Value()));
+
+        if (drivelayoutType != null) spec = spec.and((root, query, cb) -> cb.equal(root.get("drivelayout").get("info"), drivelayoutType.Value()));
 
         return jpaCarRepository.findAll(spec);
     }

@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 import ru.matvey.dealership.domain.details.Cost;
 import ru.matvey.dealership.domain.details.Detail;
-import ru.matvey.dealership.domain.details.DetailType;
+import ru.matvey.dealership.domain.details.DetailInfo;
 
 @Entity
 @DiscriminatorValue("WHEEL")
@@ -14,13 +14,13 @@ public class Wheel extends Detail {
 
     protected Wheel() {}
 
-    public Wheel(WheelType type, Cost cost, Set<String> compatibleModels) {
+    public Wheel(WheelInfo type, Cost cost, Set<String> compatibleModels) {
         super(UUID.randomUUID(), type.Value(), cost.value(), compatibleModels);
     }
 
     public Wheel(
         UUID id,
-        WheelType type,
+        WheelInfo type,
         Cost cost,
         Set<String> compatibleModels
     ) {
@@ -33,7 +33,7 @@ public class Wheel extends Detail {
     }
 
     @Override
-    public DetailType Info() {
-        return new WheelType(getValue());
+    public DetailInfo Info() {
+        return new WheelInfo(getInfo());
     }
 }

@@ -7,10 +7,11 @@ import ru.matvey.dealership.contracts.operations.DetailOperation;
 import ru.matvey.dealership.contracts.services.DetailService;
 import ru.matvey.dealership.presentation.models.DetailOperationRequest;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/details")
+@RequestMapping("/api/details")
 @RequiredArgsConstructor
 public class DetailController {
     private final DetailService detailService;
@@ -44,7 +45,7 @@ public class DetailController {
         return detailService.getDetail(id);
     }
     @GetMapping
-    public void getAllDetails() {
-        detailService.getAllDetails();
+    public List<DetailDto> getAllDetails() {
+        return detailService.getAllDetails();
     }
 }
