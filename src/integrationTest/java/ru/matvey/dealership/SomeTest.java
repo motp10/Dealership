@@ -74,7 +74,6 @@ public class SomeTest extends BaseIntegrationTest {
                 "Tesla", "Model X", "Sedan", "Black", "Electric", "Auto", "AWD", "Sport", null
         );
 
-        // Пытаемся отправить запрос с ролью USER
         mockMvc.perform(post("/api/cars")
                         .with(jwt().authorities(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_USER")))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -102,7 +101,6 @@ public class SomeTest extends BaseIntegrationTest {
 
     @Test
     void shouldFindDetailsByType() {
-        // 1. Arrange: Создаем разные детали
         Set<String> models = Set.of("Model S");
         Body body = new Body(new BodyInfo("Sedan"), new Cost(1000), models);
         CarPaint paint = new CarPaint(new PaintInfo("Red"), new Cost(500), models);
