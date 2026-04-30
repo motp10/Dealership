@@ -1,42 +1,39 @@
 package ru.matvey.dealership.domain.details.fuel;
 
-import ru.matvey.dealership.domain.details.Cost;
-import ru.matvey.dealership.domain.details.IDetail;
-import ru.matvey.dealership.domain.details.IDetailType;
-import ru.matvey.dealership.domain.details.drivelayout.DriveLayoutType;
-
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 import java.util.Set;
 import java.util.UUID;
+import ru.matvey.dealership.domain.details.Cost;
+import ru.matvey.dealership.domain.details.Detail;
+import ru.matvey.dealership.domain.details.DetailInfo;
 
-public class Fuel implements IDetail {
-    private final FuelType type;
-    private final Cost cost;
-    private final Set<String> compatibleModels;
-    private UUID id = UUID.randomUUID();
+@Entity
+@DiscriminatorValue("FUEL")
+public class Fuel extends Detail {
 
-    public Fuel(FuelType type, Cost cost, Set<String> compatibleModels) {
-        this.type = type;
-        this.cost = cost;
-        this.compatibleModels = compatibleModels;
+    protected Fuel() {}
+
+    public Fuel(FuelInfo type, Cost cost, Set<String> compatibleModels) {
+        super(UUID.randomUUID(), type.Value(), cost.value(), compatibleModels);
+    }
+
+    public Fuel(
+        UUID id,
+        FuelInfo type,
+        Cost cost,
+        Set<String> compatibleModels
+    ) {
+        super(id, type.Value(), cost.value(), compatibleModels);
     }
 
     @Override
-    public IDetailType Type() {
-        return type;
+    public String Type() {
+        return "Fuel";
     }
 
     @Override
-    public double Cost() {
-        return cost.value();
-    }
-
-    @Override
-    public boolean isCompatibleWith(String model) {
-        return compatibleModels.contains(model);
-    }
-
-    @Override
-    public UUID getId() {
-        return id;
+    public DetailInfo Info() {
+        return new FuelInfo(getInfo());
     }
 }

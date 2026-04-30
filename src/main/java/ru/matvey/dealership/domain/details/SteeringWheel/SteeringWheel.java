@@ -1,42 +1,43 @@
 package ru.matvey.dealership.domain.details.SteeringWheel;
 
-import ru.matvey.dealership.domain.details.Cost;
-import ru.matvey.dealership.domain.details.IDetail;
-import ru.matvey.dealership.domain.details.IDetailType;
-import ru.matvey.dealership.domain.details.Interior.InteriorType;
-
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 import java.util.Set;
 import java.util.UUID;
+import ru.matvey.dealership.domain.details.Cost;
+import ru.matvey.dealership.domain.details.Detail;
+import ru.matvey.dealership.domain.details.DetailInfo;
 
-public class SteeringWheel implements IDetail {
-    private final SteeringWheelType type;
-    private final Cost cost;
-    private final Set<String> compatibleModels;
-    private UUID id = UUID.randomUUID();
+@Entity
+@DiscriminatorValue("STEERINGWHEEL")
+public class SteeringWheel extends Detail {
 
-    public SteeringWheel(SteeringWheelType type, Cost cost, Set<String> compatibleModels) {
-        this.type = type;
-        this.cost = cost;
-        this.compatibleModels = compatibleModels;
+    protected SteeringWheel() {}
+
+    public SteeringWheel(
+        SteeringWheelInfo type,
+        Cost cost,
+        Set<String> compatibleModels
+    ) {
+        super(UUID.randomUUID(), type.Value(), cost.value(), compatibleModels);
+    }
+
+    public SteeringWheel(
+        UUID id,
+        SteeringWheelInfo type,
+        Cost cost,
+        Set<String> compatibleModels
+    ) {
+        super(id, type.Value(), cost.value(), compatibleModels);
     }
 
     @Override
-    public IDetailType Type() {
-        return type;
+    public String Type() {
+        return "SteeringWheel";
     }
 
     @Override
-    public double Cost() {
-        return cost.value();
-    }
-
-    @Override
-    public boolean isCompatibleWith(String model) {
-        return compatibleModels.contains(model);
-    }
-
-    @Override
-    public UUID getId() {
-        return id;
+    public DetailInfo Info() {
+        return new SteeringWheelInfo(getInfo());
     }
 }

@@ -1,8 +1,6 @@
 package ru.matvey.dealership.domain.details;
 
-import ru.matvey.dealership.domain.Exceptions.DomainValidationException;
-
-import java.math.BigDecimal;
+import ru.matvey.dealership.domain.exceptions.DomainValidationException;
 
 public record Cost(double value) {
     public Cost {

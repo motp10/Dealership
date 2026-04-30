@@ -1,49 +1,39 @@
 package ru.matvey.dealership.domain.details.Body;
 
-import ru.matvey.dealership.domain.details.Cost;
-import ru.matvey.dealership.domain.details.IDetail;
-import ru.matvey.dealership.domain.details.IDetailType;
-
-import java.math.BigDecimal;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 import java.util.Set;
 import java.util.UUID;
+import ru.matvey.dealership.domain.details.Cost;
+import ru.matvey.dealership.domain.details.Detail;
+import ru.matvey.dealership.domain.details.DetailInfo;
 
-public class Body implements IDetail {
-    private final BodyType type;
-    private final Cost cost;
-    private final Set<String> compatibleModels;
+@Entity
+@DiscriminatorValue("BODY")
+public class Body extends Detail {
 
-    private UUID id = UUID.randomUUID();
+    protected Body() {}
 
-    public Body(String type, double cost, Set<String> compatibleModels) {
-        this.type = new BodyType(type);
-        this.cost = new Cost(cost);
-        this.compatibleModels = compatibleModels;
+    public Body(BodyInfo type, Cost cost, Set<String> compatibleModels) {
+        super(UUID.randomUUID(), type.Value(), cost.value(), compatibleModels);
     }
 
-    public Body(BodyType type, Cost cost, Set<String> compatibleModels) {
-        this.type = type;
-        this.cost = cost;
-        this.compatibleModels = compatibleModels;
-    }
-
-    @Override
-    public IDetailType Type() {
-        return type;
-    }
-
-    @Override
-    public double Cost() {
-        return cost.value();
+    public Body(
+        UUID id,
+        BodyInfo type,
+        Cost cost,
+        Set<String> compatibleModels
+    ) {
+        super(id, type.Value(), cost.value(), compatibleModels);
     }
 
     @Override
-    public boolean isCompatibleWith(String model) {
-        return compatibleModels.contains(model);
+    public String Type() {
+        return "Body";
     }
 
     @Override
-    public UUID getId() {
-        return id;
+    public DetailInfo Info() {
+        return new BodyInfo(getInfo());
     }
 }
