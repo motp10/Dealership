@@ -13,4 +13,6 @@ public interface DetailsRepository {
     void delete(UUID id);
     List<Detail> getDetails(String type);
     Optional<Detail> findById(UUID id);
+
+    boolean detailExists(String type, String info);
 }

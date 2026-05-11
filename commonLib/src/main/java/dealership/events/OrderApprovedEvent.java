@@ -4,8 +4,9 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record OrderApprovedEvent(
-        UUID getOrderId,
-        String getTraceId,
+        UUID orderId,
+        UUID traceId,
         Instant occurredAt,
-        UUID assemblyOrderId
+        boolean approve,
+        UUID managerId
 ) implements BaseEvent {}

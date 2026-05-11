@@ -4,8 +4,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 public interface BaseEvent {
-    UUID getOrderId();
-    String getTraceId();
-    UUID getDetailId();
+    UUID orderId();
+    UUID traceId();
     Instant occurredAt();
 }

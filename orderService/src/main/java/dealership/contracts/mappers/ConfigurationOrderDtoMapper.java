@@ -8,7 +8,7 @@ public class ConfigurationOrderDtoMapper {
         return new ConfigurationOrderDto(
                 order.getClientId(),
                 order.getManagerId(),
-                CarDtoMapper.toDto(order.getCar()),
+                order.getCarId(),
                 order.getStatus()
         );
     }

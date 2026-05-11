@@ -121,4 +121,9 @@ public class OrderStockCar implements Order {
     public String getStatus() {
         return statusName;
     }
+
+    @Override
+    public void setManagerId(UUID newId) {
+        managerId = newId;
+    }
 }

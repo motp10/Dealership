@@ -53,21 +53,6 @@ public class TestDriveOrder implements Order {
         this.statusName = status.getName();
     }
 
-    public TestDriveOrder(
-        UUID id,
-        UUID clientId,
-        UUID carId,
-        UUID managerId,
-        Status status
-    ) {
-        this.id = id;
-        this.clientId = clientId;
-        this.carId = carId;
-        this.managerId = managerId;
-        this.status = status;
-        this.statusName = status.getName();
-    }
-
     @PostLoad
     protected void onLoad() {
         this.status = new TestDriveStatusFactory().Create(statusName);
@@ -120,5 +105,10 @@ public class TestDriveOrder implements Order {
     @Override
     public String getStatus() {
         return statusName;
+    }
+
+    @Override
+    public void setManagerId(UUID newId) {
+        managerId = newId;
     }
 }

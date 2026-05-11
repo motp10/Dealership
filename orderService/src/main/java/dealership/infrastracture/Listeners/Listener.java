@@ -21,9 +21,12 @@ public class Listener {
     public void handleStorageStatus(String jsonPayload) {
         try {
             OrderApprovedEvent event = objectMapper.readValue(jsonPayload, OrderApprovedEvent.class);
-            log.info("Storage approved order {}. Trace: {}", event.getOrderId(), event.getTraceId());
-
-            orderService.updateOrderStatus(event.getOrderId());
+            log.info("Storage approved order {}. Trace: {}", event.orderId(), event.traceId());
+            if (event.approve()) {
+                orderService.updateOrderStatus(event.orderId());
+            } else {
+                orderService.cancelOrderSystem(event.orderId());
+            }
 
         } catch (Exception e) {
             log.error("Error processing storage response", e);

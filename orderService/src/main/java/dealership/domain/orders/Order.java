@@ -10,4 +10,5 @@ public interface Order {
     UUID getManagerId();
     UUID getCarId();
     String getStatus();
+    void setManagerId(UUID newId);
 }

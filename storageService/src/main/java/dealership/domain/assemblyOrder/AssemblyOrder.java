@@ -16,5 +16,5 @@ public class AssemblyOrder {
     @Column(unique = true)
     private UUID sourceOrderId;
     private String status;
-    private String traceId;
+    private UUID traceId;
 }

@@ -2,10 +2,10 @@ package dealership.domain.orders.configurationOrder;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import dealership.domain.car.Car;
 import dealership.domain.orders.Order;
 import dealership.domain.orders.Status;
 import dealership.domain.orders.stockCarOrder.status.StockCarOrderCreated;
+import lombok.Setter;
 
 
 import java.time.Instant;
@@ -26,18 +26,15 @@ public class ConfigurationOrder implements Order {
     @Column(name = "manager_id")
     private UUID managerId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "car_id")
-    private Car car;
+    @Column(name = "car_id")
+    @Setter
+    private UUID carId;
 
     @Column(name = "status")
     private String statusName;
 
     @Transient
     private Status status;
-
-    @Column(name = "final_price")
-    private Double finalPrice;
 
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;
@@ -50,30 +47,13 @@ public class ConfigurationOrder implements Order {
 
     protected ConfigurationOrder() {}
 
-    public ConfigurationOrder(UUID clientId, Car car, UUID managerId) {
+    public ConfigurationOrder(UUID clientId, UUID carId, UUID managerId) {
         this.id = UUID.randomUUID();
         this.clientId = clientId;
-        this.car = car;
+        this.carId = carId;
         this.managerId = managerId;
         this.status = new StockCarOrderCreated();
         this.statusName = status.getName();
-        this.finalPrice = car.getTotalPrice();
-    }
-
-    public ConfigurationOrder(
-        UUID id,
-        UUID clientId,
-        Car car,
-        UUID managerId,
-        Status status
-    ) {
-        this.id = id;
-        this.clientId = clientId;
-        this.car = car;
-        this.managerId = managerId;
-        this.status = status;
-        this.statusName = status.getName();
-        this.finalPrice = car.getTotalPrice();
     }
 
     @PostLoad
@@ -91,7 +71,6 @@ public class ConfigurationOrder implements Order {
     protected void onUpdate() {
         updatedAt = Instant.now();
         if (status != null) statusName = status.getName();
-        if (car != null) finalPrice = car.getTotalPrice();
     }
 
     @Override
@@ -123,11 +102,16 @@ public class ConfigurationOrder implements Order {
 
     @Override
     public UUID getCarId() {
-        return car.getId();
+        return carId;
     }
 
     @Override
     public String getStatus() {
         return statusName;
+    }
+
+    @Override
+    public void setManagerId(UUID newId) {
+        managerId = newId;
     }
 }

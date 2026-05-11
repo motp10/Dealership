@@ -1,5 +1,6 @@
 package dealership.application;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dealership.abstraction.AssemblyOrderRepository;
 import dealership.abstraction.StorageOutboxRepository;
 import dealership.domain.assemblyOrder.AssemblyOrder;
@@ -31,6 +32,7 @@ public class DetailServiceImpl implements DetailService {
     private final DetailsRepository detailsRepository;
     private final AssemblyOrderRepository assemblyOrderRepository;
     private final StorageOutboxRepository outboxRepository;
+    private final ObjectMapper objectMapper;
     @Override
     @PreAuthorize("hasAnyRole('WAREHOUSEADMIN', 'ADMIN')")
     public UUID addDetail(DetailOperation.Request request) {
@@ -74,27 +76,31 @@ public class DetailServiceImpl implements DetailService {
 
     @Override
     public void processAssemblyOrder(OrderSentForApprovalEvent event) {
-        if (assemblyOrderRepository.existsBySourceOrderId(event.getOrderId())) {
-            log.warn("Order {} already processed", event.getOrderId());
+        if (assemblyOrderRepository.existsBySourceOrderId(event.orderId())) {
+            log.warn("Order {} already processed", event.orderId());
             return;
         }
 
-        getDetail(event.getDetailId());
+        boolean allDetailsExist = true;
+        for (var detail : event.details()) {
+            allDetailsExist &= detailsRepository.detailExists(detail.detailType(), detail.detailInfo());
+        }
+
 
         AssemblyOrder assembly = new AssemblyOrder();
-        assembly.setSourceOrderId(event.getOrderId());
-        assembly.setTraceId(event.getTraceId());
+        assembly.setSourceOrderId(event.orderId());
+        assembly.setTraceId(event.traceId());
         assembly.setStatus("ASSEMBLED");
         assemblyOrderRepository.save(assembly);
 
         var responseEvent = new OrderApprovedEvent(
-                event.getOrderId(), event.getTraceId(), Instant.now(), assembly.getId()
+                event.orderId(), event.traceId(), Instant.now(), allDetailsExist, assembly.getId()
         );
 
         try {
             OutboxMessage outbox = new OutboxMessage();
             outbox.setEventType(KafkaTopics.STORAGE_STATUS);
-            outbox.setId(event.getTraceId());
+            outbox.setId(event.traceId());
             outbox.setPayload(objectMapper.writeValueAsString(responseEvent));
             outboxRepository.save(outbox);
         } catch (Exception e) {

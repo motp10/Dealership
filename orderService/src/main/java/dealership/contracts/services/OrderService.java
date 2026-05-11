@@ -3,6 +3,7 @@ package dealership.contracts.services;
 import dealership.contracts.models.ConfigurationOrderDto;
 import dealership.contracts.models.OrderDto;
 import dealership.contracts.operations.CarComplictation;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -29,4 +30,10 @@ public interface OrderService {
     void updateOrderStatus(UUID id);
 
     void cancelOrder(UUID id, UUID clientId);
+
+    @Transactional
+    void cancelOrderSystem(UUID id);
+
+    @Transactional
+    void updateOrderStatusSystem(UUID id);
 }

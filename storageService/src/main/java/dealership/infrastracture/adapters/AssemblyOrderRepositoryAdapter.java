@@ -20,13 +20,7 @@ public class AssemblyOrderRepositoryAdapter implements AssemblyOrderRepository {
     }
 
     @Override
-    public Optional<AssemblyOrder> findById(UUID id) {
-        return orderRepository.findById(id);
-    }
-
-    @Override
-    public boolean existsBySourceOrder(UUID sourceOrderId) {
-        // Делегируем вызов сгенерированному методу Spring Data
+    public boolean existsBySourceOrderId(UUID sourceOrderId) {
         return orderRepository.existsBySourceOrderId(sourceOrderId);
     }
 }

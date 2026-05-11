@@ -1,17 +1,34 @@
 version: '3.8'
 
 services:
-  db:
+  order-db:
     image: postgres:16-alpine
-    container_name: dealership_db
+    container_name: order_db
     environment:
-      POSTGRES_DB: dealership_db
+      POSTGRES_DB: order_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password123
     ports:
-      - "8888:5432"
+      - "5432:5432"
     volumes:
-      - dealership_db_data:/var/lib/postgresql/data
+      - order_db_data:/var/lib/postgresql/data
+    networks:
+      - dealership-network
+
+  storage-db:
+    image: postgres:16-alpine
+    container_name: storage_db
+    environment:
+      POSTGRES_DB: storage_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+    ports:
+      - "5433:5432"
+    volumes:
+      - storage_db_data:/var/lib/postgresql/data
+    networks:
+      - dealership-network
+
   keycloak:
     image: quay.io/keycloak/keycloak:23.0.0
     container_name: keycloak
@@ -22,8 +39,78 @@ services:
     ports:
       - "8082:8080"
     volumes:
-        - ./keycloak_data:/opt/keycloak/data
+      - ./keycloak_data:/opt/keycloak/data
     command: start-dev
+    networks:
+      - dealership-network
+
+  kafka:
+    image: apache/kafka:latest
+    container_name: kafka
+    environment:
+      - CLUSTER_ID=MkU3OEVBNTcwNTJENDM2Qk
+      - KAFKA_NODE_ID=1
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+    ports:
+      - "9092:9092"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - dealership-network
+
+  order-service:
+    build:
+      context: ..
+      dockerfile: orderService/Dockerfile
+    container_name: order_service
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://order-db:5432/order_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password123
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/dealership-realm
+    depends_on:
+      - order-db
+      - kafka
+      - keycloak
+    networks:
+      - dealership-network
+
+  storage-service:
+    build:
+      context: ..
+      dockerfile: storageService/Dockerfile
+    container_name: storage_service
+    ports:
+      - "8081:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://storage-db:5432/storage_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password123
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/dealership-realm
+    depends_on:
+      - storage-db
+      - kafka
+      - keycloak
+    networks:
+      - dealership-network
+
+networks:
+  dealership-network:
+    driver: bridge
 
 volumes:
-  dealership_db_data:
+  order_db_data:
+  storage_db_data:
+  kafka_data:

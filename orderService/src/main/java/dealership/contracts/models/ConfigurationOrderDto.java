@@ -7,10 +7,10 @@ import java.util.UUID;
 public record ConfigurationOrderDto(
     UUID clientId,
     UUID managerId,
-    CarDto car,
+    UUID carId,
     String status
 ) {
     public ConfigurationOrderDto(ConfigurationOrder order) {
-        this(order.getClientId(), order.getManagerId(), new CarDto(order.getCar()), order.getStatus());
+        this(order.getClientId(), order.getManagerId(), order.getCarId(), order.getStatus());
     }
 }

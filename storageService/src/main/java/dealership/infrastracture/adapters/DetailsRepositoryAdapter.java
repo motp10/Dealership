@@ -40,4 +40,10 @@ public class DetailsRepositoryAdapter implements DetailsRepository {
     public Optional<Detail> findById(UUID id) {
         return jpaDetailRepository.findById(id);
     }
+
+    @Override
+    public boolean detailExists(String type, String info) {
+        return jpaDetailRepository.findByType(type).stream()
+                .anyMatch(detail -> detail.getInfo().equals(info));
+    }
 }

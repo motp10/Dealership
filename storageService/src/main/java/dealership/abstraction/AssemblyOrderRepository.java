@@ -7,11 +7,9 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface AssemblyOrderRepository extends JpaRepository<AssemblyOrder, UUID> {
+public interface AssemblyOrderRepository {
 
     boolean existsBySourceOrderId(UUID sourceOrderId);
 
     void save(AssemblyOrder order);
-
-    boolean existsBySourceOrder(UUID sourceOrderId);
 }

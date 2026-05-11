@@ -1,33 +1,35 @@
 package dealership.application;
 
-import dealership.abstraction.ComplictaionOrderRepository;
-import dealership.abstraction.DetailsRepository;
-import dealership.abstraction.StockCarOrderRepository;
-import dealership.abstraction.TestDriveRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import dealership.abstraction.*;
+import dealership.contracts.models.ConfigurationOrderDto;
+import dealership.contracts.models.OrderDto;
+import dealership.domain.message.MessageStatus;
+import dealership.domain.message.OutboxMessage;
+import dealership.domain.orders.Order;
+import dealership.domain.orders.configurationOrder.ConfigurationOrder;
+import dealership.events.OrderSentForApprovalEvent;
 import dealership.exceptions.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.jboss.logging.MDC;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import dealership.contracts.mappers.ConfigurationOrderDtoMapper;
 import dealership.contracts.mappers.OrderDtoMapper;
-import dealership.contracts.models.ConfigurationOrderDto;
-import dealership.contracts.models.OrderDto;
 import dealership.contracts.operations.CarComplictation;
 import dealership.contracts.services.OrderService;
-import dealership.domain.car.Car;
-import dealership.domain.details.Body.Body;
-import dealership.domain.details.Cost;
-import dealership.domain.details.Transmission.Transmission;
-import dealership.domain.details.color.CarPaint;
-import dealership.domain.details.drivelayout.DriveLayout;
-import dealership.domain.details.fuel.Fuel;
-import dealership.domain.orders.configurationOrder.ConfigurationOrder;
 import dealership.domain.orders.stockCarOrder.OrderStockCar;
 import dealership.domain.orders.testDriveOrder.TestDriveOrder;
 
+import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +37,9 @@ public class OrderServiceImpl implements OrderService {
     private final StockCarOrderRepository stockCarOrderRepository;
     private final TestDriveRepository testDriveRepository;
     private final ComplictaionOrderRepository complictaionOrderRepository;
-    private final DetailsRepository detailsRepository;
+    private final MessageRepository messageRepository;
+
+    private final ObjectMapper objectMapper;
     @Override
     @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN', USER)")
     public UUID makeStockCarOrder(UUID carID, UUID clientId) {
@@ -48,47 +52,42 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN', USER)")
     public UUID makeOrderWithConfiguration(CarComplictation complictation, UUID clientId) {
-        Body body = (Body) detailsRepository.getDetails("BODY").stream()
-                .filter(d -> d.getInfo().equals(complictation.bodyType()))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("Body not found: " + complictation.bodyType()));
+        UUID assemblyOrderId = UUID.randomUUID();
+        UUID orderId = UUID.randomUUID();
 
-        CarPaint color = (CarPaint) detailsRepository.getDetails("COLOR").stream()
-                .filter(d -> d.getInfo().equals(complictation.color()))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("Body not found: " + complictation.color()));
+        ConfigurationOrder configurationOrder = new ConfigurationOrder(clientId, null, null);
 
-        Fuel fuel = (Fuel) detailsRepository.getDetails("FUEL").stream()
-                .filter(d -> d.getInfo().equals(complictation.fuelType()))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("Body not found: " + complictation.fuelType()));
-
-        Transmission transmission = (Transmission) detailsRepository.getDetails("TRANSMISSION").stream()
-                .filter(d -> d.getInfo().equals(complictation.transmissionType()))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("Body not found: " + complictation.transmissionType()));
-
-        DriveLayout driveLayout = (DriveLayout) detailsRepository.getDetails("DRIVELAYOUT").stream()
-                .filter(d -> d.getInfo().equals(complictation.drivelayoutType()))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("Body not found: " + complictation.drivelayoutType()));
-
-        Car car = new Car(
-                complictation.brand(),
-                complictation.model(),
-                body,
-                color,
-                fuel,
-                transmission,
-                driveLayout,
-                new Cost(100)
+        List<OrderSentForApprovalEvent.DetailItem> detailItems = List.of(
+                new OrderSentForApprovalEvent.DetailItem("BODY", complictation.bodyType()),
+                new OrderSentForApprovalEvent.DetailItem("COLOR", complictation.color()),
+                new OrderSentForApprovalEvent.DetailItem("FUEL", complictation.fuelType()),
+                new OrderSentForApprovalEvent.DetailItem("TRANSMISSION", complictation.transmissionType()),
+                new OrderSentForApprovalEvent.DetailItem("DRIVELAYOUT", complictation.drivelayoutType())
         );
 
-        UUID managerId = null;
-        ConfigurationOrder order = new ConfigurationOrder(clientId, car, managerId);
+        OrderSentForApprovalEvent event = new OrderSentForApprovalEvent(
+                orderId,
+                (UUID) MDC.get("traceId"),
+                Instant.now(),
+                assemblyOrderId,
+                detailItems
+        );
 
-        complictaionOrderRepository.add(order);
-        return order.getId();
+        OutboxMessage outbox = new OutboxMessage();
+        outbox.setId(UUID.randomUUID());
+        try {
+            outbox.setPayload(objectMapper.writeValueAsString(event));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Serialization error", e);
+        }
+        outbox.setEventType("OrderSentForApproval");
+        outbox.setStatus(MessageStatus.PENDING);
+        outbox.setCreatedAt(Instant.now());
+
+        messageRepository.save(outbox);
+        complictaionOrderRepository.add(configurationOrder);
+
+        return orderId;
     }
 
     @Override
@@ -143,20 +142,52 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
     public void updateOrderStatus(UUID id) {
-        complictaionOrderRepository.findById(id).ifPresent(order -> order.nextStep());
-        stockCarOrderRepository.findById(id).ifPresent(order -> order.nextStep());
-        testDriveRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("no order with this id:" + id)).nextStep();
+        Order order = Stream.of(
+                        complictaionOrderRepository.findById(id),
+                        stockCarOrderRepository.findById(id),
+                        testDriveRepository.findById(id)
+                )
+                .flatMap(Optional::stream)
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("Order not found with id: " + id));
+
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        UUID managerId = UUID.fromString(jwt.getSubject());
+        if (order.getManagerId() == null) {
+            order.setManagerId(managerId);
+
+        }
     }
 
     @Override
+    @Transactional
     @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN') or @SecurityChecker.isConfigOrderOwner(#id, #clientId)")
     public void cancelOrder(UUID id, UUID clientId) {
         complictaionOrderRepository.findById(id).ifPresent(order -> order.cancel());
         stockCarOrderRepository.findById(id).ifPresent(order -> order.cancel());
         testDriveRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("no order with this id:" + id)).cancel();
+    }
+
+    @Transactional
+    @Override
+    public void cancelOrderSystem(UUID id) {
+        complictaionOrderRepository.findById(id).ifPresent(order -> order.cancel());
+        stockCarOrderRepository.findById(id).ifPresent(order -> order.cancel());
+        testDriveRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("no order with this id:" + id)).cancel();
+    }
+
+    @Transactional
+    @Override
+    public void updateOrderStatusSystem(UUID id) {
+        complictaionOrderRepository.findById(id).ifPresent(order -> order.nextStep());
+        stockCarOrderRepository.findById(id).ifPresent(order -> order.nextStep());
+        testDriveRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("no order with this id:" + id)).nextStep();
     }
 }
