@@ -5,6 +5,7 @@ import dealership.domain.message.OutboxMessage;
 
 import java.util.List;
 
+
 public interface MessageRepository {
     List<OutboxMessage> getAll();
 

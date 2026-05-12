@@ -15,7 +15,7 @@ import java.util.UUID;
 @RequestMapping("/api/configurationCars")
 @RequiredArgsConstructor
 public class ConfigurationCarOrderController {
-    OrderService orderService;
+    private final OrderService orderService;
     @PostMapping
     public UUID makeOrder(@RequestBody CarConfigurationRequest request, JwtAuthenticationToken auth) {
         UUID clientId = UUID.fromString(auth.getToken().getSubject());

@@ -41,7 +41,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final ObjectMapper objectMapper;
     @Override
-    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN', USER)")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN', 'USER')")
     public UUID makeStockCarOrder(UUID carID, UUID clientId) {
         UUID managerId = null;
         OrderStockCar order = new OrderStockCar(clientId, carID, managerId);
@@ -50,7 +50,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN', USER)")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN', 'USER')")
     public UUID makeOrderWithConfiguration(CarComplictation complictation, UUID clientId) {
         UUID assemblyOrderId = UUID.randomUUID();
         UUID orderId = UUID.randomUUID();
@@ -91,7 +91,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN', USER)")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN', 'USER')")
     public UUID makeTestDriveOrder(UUID carId, UUID clientId) {
         UUID managerId = null;
         TestDriveOrder order = new TestDriveOrder(clientId, carId, managerId);
@@ -100,7 +100,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN', USER) or @SecurityChecker.isConfigOrderOwner(#id, #clientId)")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN', 'USER') or @SecurityChecker.isConfigOrderOwner(#id, #clientId)")
     public ConfigurationOrderDto getConfigurationOrder(UUID id, UUID clientId) {
         return complictaionOrderRepository.findById(id).map(ConfigurationOrderDtoMapper::toDto).orElseThrow(() -> new EntityNotFoundException("no order with this id:" + id));
     }
@@ -114,7 +114,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN', USER) or @SecurityChecker.isConfigOrderOwner(#id, #clientId)")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN', 'USER') or @SecurityChecker.isConfigOrderOwner(#id, #clientId)")
     public OrderDto getStockCarOrder(UUID id, UUID clientId) {
         return stockCarOrderRepository.findById(id).map(OrderDtoMapper::toDto).orElseThrow(() -> new EntityNotFoundException("no order with this id:" + id));
     }

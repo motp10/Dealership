@@ -12,7 +12,7 @@ COPY orderService ./orderService
 RUN gradle :orderService:bootJar --no-daemon
 
 # --- ЭТАП ЗАПУСКА ---
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 # Копируем JAR из папки билда модуля

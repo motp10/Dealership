@@ -1,6 +1,6 @@
 package dealership.infrastracture.schedullers;
 
-import dealership.abstraction.StorageOutboxRepository;
+import dealership.abstraction.OutboxMessageRepository;
 import dealership.domain.message.MessageStatus;
 import dealership.domain.message.OutboxMessage;
 import jakarta.transaction.Transactional;
@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class Scheduller {
 
-    private final StorageOutboxRepository messageRepository;
+    private final OutboxMessageRepository messageRepository;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
     @Scheduled(fixedDelay = 5000)

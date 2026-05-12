@@ -2,7 +2,7 @@ package dealership.application;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dealership.abstraction.AssemblyOrderRepository;
-import dealership.abstraction.StorageOutboxRepository;
+import dealership.abstraction.OutboxMessageRepository;
 import dealership.domain.assemblyOrder.AssemblyOrder;
 import dealership.domain.message.OutboxMessage;
 import dealership.events.OrderApprovedEvent;
@@ -20,6 +20,7 @@ import dealership.contracts.operations.DetailOperation;
 import dealership.contracts.services.DetailService;
 import dealership.domain.details.Detail;
 import dealership.domain.details.DetailsFactory;
+import dealership.infrastracture.adapters.OutboxMessageRepositoryAdapter;
 
 import java.time.Instant;
 import java.util.List;
@@ -31,7 +32,7 @@ import java.util.UUID;
 public class DetailServiceImpl implements DetailService {
     private final DetailsRepository detailsRepository;
     private final AssemblyOrderRepository assemblyOrderRepository;
-    private final StorageOutboxRepository outboxRepository;
+    private final OutboxMessageRepository outboxRepository;
     private final ObjectMapper objectMapper;
     @Override
     @PreAuthorize("hasAnyRole('WAREHOUSEADMIN', 'ADMIN')")

@@ -13,7 +13,7 @@ import java.util.UUID;
 @RequestMapping("/api/stockCars")
 @RequiredArgsConstructor
 public class StockCarOrderController {
-    OrderService orderService;
+    private final OrderService orderService;
 
     @PostMapping
     public UUID makeOrder(@PathVariable UUID carId, JwtAuthenticationToken auth) {
