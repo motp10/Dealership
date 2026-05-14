@@ -1,1 +1,4 @@
 rootProject.name = 'java-template'
+include 'orderService'
+include 'storageService'
+include 'commonLib'

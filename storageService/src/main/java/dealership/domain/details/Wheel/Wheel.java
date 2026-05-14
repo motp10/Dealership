@@ -1,0 +1,41 @@
+package dealership.domain.details.Wheel;
+
+import dealership.domain.details.Wheel.WheelInfo;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import dealership.domain.details.Cost;
+import dealership.domain.details.Detail;
+import dealership.domain.details.DetailInfo;
+
+import java.util.Set;
+import java.util.UUID;
+
+@Entity
+@DiscriminatorValue("WHEEL")
+public class Wheel extends Detail {
+
+    protected Wheel() {}
+
+    public Wheel(WheelInfo type, Cost cost, Set<String> compatibleModels) {
+        super(UUID.randomUUID(), type.Value(), cost.value(), compatibleModels);
+    }
+
+    public Wheel(
+        UUID id,
+        WheelInfo type,
+        Cost cost,
+        Set<String> compatibleModels
+    ) {
+        super(id, type.Value(), cost.value(), compatibleModels);
+    }
+
+    @Override
+    public String Type() {
+        return "Wheel";
+    }
+
+    @Override
+    public DetailInfo Info() {
+        return new WheelInfo(getInfo());
+    }
+}
