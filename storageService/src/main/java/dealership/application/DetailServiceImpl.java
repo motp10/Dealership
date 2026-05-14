@@ -77,6 +77,7 @@ public class DetailServiceImpl implements DetailService {
 
     @Override
     public void processAssemblyOrder(OrderSentForApprovalEvent event) {
+        System.out.println(event.orderId());
         if (assemblyOrderRepository.existsBySourceOrderId(event.orderId())) {
             log.warn("Order {} already processed", event.orderId());
             return;
@@ -95,17 +96,22 @@ public class DetailServiceImpl implements DetailService {
         assemblyOrderRepository.save(assembly);
 
         var responseEvent = new OrderApprovedEvent(
-                event.orderId(), event.traceId(), Instant.now(), allDetailsExist, assembly.getId()
+                event.orderId(),
+                event.traceId() != null ? event.traceId() : UUID.randomUUID(),
+                Instant.now(),
+                allDetailsExist,
+                assembly.getId()
         );
 
         try {
             OutboxMessage outbox = new OutboxMessage();
-            outbox.setEventType(KafkaTopics.STORAGE_STATUS);
-            outbox.setId(event.traceId());
+            outbox.setEventType("OrderApproved");
+            outbox.setId(UUID.randomUUID());
             outbox.setPayload(objectMapper.writeValueAsString(responseEvent));
             outboxRepository.save(outbox);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to serialize response event", e);
+            log.error("Critical error in outbox saving", e);
+            throw new RuntimeException("Failed to process outbox", e);
         }
     }
 }

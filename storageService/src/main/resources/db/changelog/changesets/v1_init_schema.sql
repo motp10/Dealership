@@ -48,3 +48,11 @@ CREATE TABLE outbox_messages (
     event_type VARCHAR(255),
     created_at TIMESTAMP
 );
+
+--changeset matvey:7
+CREATE TABLE assembly_orders (
+    id UUID PRIMARY KEY,
+    source_order_id UUID UNIQUE,
+    status VARCHAR(50),
+    trace_id UUID
+);

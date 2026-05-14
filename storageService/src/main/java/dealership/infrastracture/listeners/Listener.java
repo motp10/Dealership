@@ -19,6 +19,7 @@ public class Listener {
     @KafkaListener(topics = KafkaTopics.ORDER_APPROVAL, groupId = "storage-group")
     public void handleNewOrder(String jsonPayload) {
         try {
+            log.info("RECEIVED RAW PAYLOAD: {}", jsonPayload);
             var event = objectMapper.readValue(jsonPayload, OrderSentForApprovalEvent.class);
 
             detailService.processAssemblyOrder(event);
