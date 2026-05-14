@@ -4,10 +4,10 @@
 CREATE TABLE details (
     id UUID PRIMARY KEY,
     type VARCHAR(100) NOT NULL,
-    value VARCHAR(255) NOT NULL,
+    detail_info VARCHAR(255) NOT NULL,
     cost DOUBLE PRECISION NOT NULL,
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP,
+    created_at TIMESTAMP WITH TIME ZONE,
+    updated_at TIMESTAMP WITH TIME ZONE,
     removed BOOLEAN DEFAULT FALSE
 );
 

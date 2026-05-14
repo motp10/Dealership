@@ -1,7 +1,7 @@
 --liquibase formatted sql
 
 --changeset matvey:9
-INSERT INTO details (id, type, value, cost, created_at, updated_at, removed) VALUES
+INSERT INTO details (id, type, detail_info, cost, created_at, updated_at, removed) VALUES
 ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa1', 'BODY', 'Sedan', 50000.00, NOW(), NOW(), false),
 ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa2', 'FUEL', 'Petrol', 30000.00, NOW(), NOW(), false),
 ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaa3', 'TRANSMISSION', 'Automatic', 40000.00, NOW(), NOW(), false),
