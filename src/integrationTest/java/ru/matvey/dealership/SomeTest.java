@@ -20,6 +20,7 @@ import ru.matvey.dealership.domain.details.fuel.Fuel;
 import ru.matvey.dealership.domain.details.fuel.FuelInfo;
 import ru.matvey.dealership.infrastracture.jparepositories.JpaDetailRepository;
 import ru.matvey.dealership.presentation.models.CarConfigurationRequest;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -30,6 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Transactional
 public class SomeTest extends BaseIntegrationTest {
 
     @Autowired
@@ -78,7 +80,7 @@ public class SomeTest extends BaseIntegrationTest {
                         .with(jwt().authorities(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_USER")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(carRequest)))
-                .andExpect(status().isForbidden()); // Ожидаем 403 Forbidden
+                .andExpect(status().isForbidden());
     }
 
     @Test
