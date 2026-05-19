@@ -9,6 +9,9 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/commonLib" />
+            <option value="$PROJECT_DIR$/orderService" />
+            <option value="$PROJECT_DIR$/storageService" />
           </set>
         </option>
       </GradleProjectSettings>

@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+option java_package = "com.autosalon.grpc";
+option java_multiple_files = true;
+
+// Сервис для работы со складом автомобилей
+service CarStorageService {
+  rpc GetAvailableCars (Empty) returns (CarListResponse);
+  rpc GetCarById (CarIdRequest) returns (CarResponse);
+}
+
+message Empty {}
+
+message CarIdRequest {
+  string id = 1;
+}
+
+message DetailMessage {
+  string id = 1;
+  string type = 2;
+  string info = 3;
+  double cost = 4;
+}
+
+message CarResponse {
+  string id = 1;
+  string brand = 2;
+  string model = 3;
+
+  double base_cost = 4;
+  double total_price = 5;
+
+  bool is_available = 6;
+
+  DetailMessage body = 7;
+  DetailMessage paint = 8;
+  DetailMessage fuel = 9;
+  DetailMessage transmission = 10;
+  DetailMessage drivelayout = 11;
+}
+
+message CarListResponse {
+  repeated CarResponse cars = 1;
+}
