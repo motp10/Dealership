@@ -29,8 +29,11 @@ ext {
 }
 
 dependencies {
-
     implementation project(':commonLib')
+
+    implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+    implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     implementation platform('org.springframework.boot:spring-boot-dependencies:3.2.3')
 
@@ -55,6 +58,8 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    id 'org.graalvm.buildtools.native' version '0.10.1'
 }
 
 tasks.withType(JavaCompile).configureEach {
