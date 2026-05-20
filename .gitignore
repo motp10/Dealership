@@ -44,3 +44,6 @@ bin/
 .DS_Store
 
 readme.md
+
+build/
+**/build/

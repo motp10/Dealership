@@ -8,12 +8,12 @@ import com.autosalon.grpc.Empty;
 import dealership.abstraction.CarsRepository;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
-import net.devh.boot.grpc.server.service.GrpcService;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@GrpcService
+@Component
 @RequiredArgsConstructor
 public class GrpcServer extends CarStorageServiceGrpc.CarStorageServiceImplBase {
 

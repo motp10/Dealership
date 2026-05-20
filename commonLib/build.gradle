@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
-    id 'org.springframework.boot' version '3.2.3' apply false
-    id 'io.spring.dependency-management' version '1.1.4'
+    id 'org.springframework.boot' version '3.3.5' apply false // Обновили
+    id 'io.spring.dependency-management' version '1.1.6'      // Обновили
     id 'com.google.protobuf' version '0.9.4'
     id 'idea'
 }
@@ -23,7 +23,7 @@ idea {
 }
 
 dependencies {
-    implementation platform('org.springframework.boot:spring-boot-dependencies:3.2.3')
+    implementation platform('org.springframework.boot:spring-boot-dependencies:3.3.5')
 
     api 'io.grpc:grpc-protobuf:1.62.2'
     api 'io.grpc:grpc-stub:1.62.2'

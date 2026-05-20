@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # --- БАЗЫ ДАННЫХ ---
   order-db:
     image: postgres:16-alpine
     container_name: order-db
@@ -29,6 +30,7 @@ services:
     networks:
       - dealership-network
 
+  # --- СЕРВЕР АВТОРИЗАЦИИ (Keycloak) ---
   keycloak:
     image: quay.io/keycloak/keycloak:23.0.0
     container_name: keycloak
@@ -36,7 +38,8 @@ services:
       KC_DB: dev-file
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_HOSTNAME: localhost
+      # Настраиваем Keycloak так, чтобы его внешним адресом для токенов был host.docker.internal
+      KC_HOSTNAME: host.docker.internal
       KC_HOSTNAME_PORT: 8082
       KC_HOSTNAME_STRICT: false
       KC_HTTP_RELATIVE_PATH: /
@@ -48,6 +51,7 @@ services:
     networks:
       - dealership-network
 
+  # --- БРОКЕР СООБЩЕНИЙ (Kafka) ---
   kafka:
     image: apache/kafka:latest
     container_name: kafka
@@ -68,6 +72,7 @@ services:
     networks:
       - dealership-network
 
+  # --- СБОР ТРАССИРОВОК (Observability) ---
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.91.0
     container_name: otel-collector
@@ -78,7 +83,7 @@ services:
       - dealership-network
 
   tempo:
-    image: grafana/tempo:latest
+    image: grafana/tempo:2.3.1 # Фиксированная стабильная версия
     container_name: tempo
     command: [ "-config.file=/etc/tempo.yaml" ]
     volumes:
@@ -104,9 +109,12 @@ services:
       - "3000:3000"
     volumes:
       - ./infra/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+    depends_on:
+      - tempo
     networks:
       - dealership-network
 
+  # --- СЕРВИСЫ ПРИЛОЖЕНИЯ (Native Images) ---
   order-service:
     build:
       context: ..
@@ -120,8 +128,11 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: password123
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://localhost:8082/realms/dealership-realm
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/dealership-realm/protocol/openid-connect/certs
+
+      # Токены будут иметь issuer "host.docker.internal:8082" и проверяться по нему же
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:8082/realms/dealership-realm
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://host.docker.internal:8082/realms/dealership-realm/protocol/openid-connect/certs
+
       MANAGEMENT_OTLP_TRACING_ENDPOINT: http://otel-collector:4318/v1/traces
       MANAGEMENT_TRACING_SAMPLING_PROBABILITY: 1.0
     depends_on:
@@ -129,6 +140,10 @@ services:
       - kafka
       - keycloak
       - otel-collector
+      - storage-service
+    # На Linux это позволяет контейнеру достучаться до портов вашего хоста
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - dealership-network
 
@@ -146,8 +161,11 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: password123
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://localhost:8082/realms/dealership-realm
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/dealership-realm/protocol/openid-connect/certs
+
+      # Токены будут иметь issuer "host.docker.internal:8082" и проверяться по нему же
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:8082/realms/dealership-realm
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://host.docker.internal:8082/realms/dealership-realm/protocol/openid-connect/certs
+
       MANAGEMENT_OTLP_TRACING_ENDPOINT: http://otel-collector:4318/v1/traces
       MANAGEMENT_TRACING_SAMPLING_PROBABILITY: 1.0
     depends_on:
@@ -155,6 +173,8 @@ services:
       - kafka
       - keycloak
       - otel-collector
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - dealership-network
 

@@ -1,11 +1,14 @@
 package dealership;
 
+import dealership.runtimehints.MyRuntimeHints;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ImportRuntimeHints;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 
 @EnableScheduling
+@ImportRuntimeHints(MyRuntimeHints.class)
 @SpringBootApplication
 public class Main {
     public Main() {}

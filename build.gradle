@@ -1,19 +1,14 @@
 plugins {
     id 'java'
-    id 'idea'
-    id 'application'
-    id 'jacoco'
-    id 'org.springframework.boot' version '3.2.3'
-    id 'io.spring.dependency-management' version '1.1.4'
+    id 'org.springframework.boot' version '3.3.5'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'org.graalvm.buildtools.native' version '0.10.3'
 }
+
+apply plugin: 'application'
 
 group = 'org.example'
 version = '1.0-SNAPSHOT'
-
-ext {
-    mapstructVersion = '1.5.5.Final'
-    lombokVersion = '1.18.30'
-}
 
 java {
     toolchain {
@@ -29,81 +24,62 @@ repositories {
     mavenCentral()
 }
 
-sourceSets {
-    integrationTest {
-        java.srcDir file('src/integrationTest/java')
-        resources.srcDir file('src/integrationTest/resources')
-
-        compileClasspath += sourceSets.main.output + sourceSets.test.output
-        runtimeClasspath += output + compileClasspath
-    }
-}
-
-configurations {
-    integrationTestImplementation.extendsFrom testImplementation
-    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
-    integrationTestAnnotationProcessor.extendsFrom testAnnotationProcessor
-}
-
 dependencies {
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+    // Подключаем платформу Spring Boot для автоматического управления версиями
+    implementation platform('org.springframework.boot:spring-boot-dependencies:3.3.5')
 
-    testImplementation 'com.h2database:h2'
+    implementation project(':commonLib')
+
+    implementation 'io.grpc:grpc-netty-shaded:1.62.2'
+    implementation 'io.grpc:grpc-protobuf:1.62.2'
+    implementation 'io.grpc:grpc-stub:1.62.2'
+
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    implementation 'org.springframework.kafka:spring-kafka'
     implementation 'org.liquibase:liquibase-core'
     runtimeOnly 'org.postgresql:postgresql'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0'
 
-    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
-    compileOnly "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"
-    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    // Micrometer Tracing для Observability
+    implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+    implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
+
+    // Lombok & MapStruct
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.testcontainers:junit-jupiter:1.19.7'
-    testImplementation 'org.testcontainers:postgresql:1.19.7'
-
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
-    testImplementation 'org.springframework.security:spring-security-test'
-    integrationTestImplementation 'com.h2database:h2'
 }
 
-idea {
-    module {
-        testSources.from sourceSets.integrationTest.java.srcDirs
-        testResources.from sourceSets.integrationTest.resources.srcDirs
-    }
+// Конфигурация Native Image
+bootBuildImage {
+    builder = "paketobuildpacks/builder-jammy-tiny:latest"
+    environment = [
+            "BP_NATIVE_IMAGE": "true",
+            "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": "--initialize-at-run-time=ch.qos.logback,io.grpc.netty.shaded.io.netty,org.slf4j --allow-incomplete-classpath"
+    ]
 }
 
-tasks.register('integrationTest', Test) {
-    description = 'Runs integration tests.'
-    group = 'verification'
-    testClassesDirs = sourceSets.integrationTest.output.classesDirs
-    classpath = sourceSets.integrationTest.runtimeClasspath
-    useJUnitPlatform()
-    shouldRunAfter test
-}
-
+// Общие настройки компиляции
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+    options.fork = true
+    options.forkOptions.jvmArgs << "--add-opens=java.base/java.lang=ALL-UNNAMED"
+}
+
+// Правильная настройка AOT, которая не падает, если задачи нет
+tasks.withType(org.springframework.boot.gradle.tasks.aot.ProcessAot).configureEach {
+    environment "HIBERNATE_VALIDATOR_FAIL_FAST", "true"
 }
 
 test {
     useJUnitPlatform()
-    finalizedBy jacocoTestReport
-}
-
-jacocoTestReport {
-    dependsOn test
-    reports { html.required = true }
-}
-
-check.dependsOn integrationTest
-
-tasks.named('processIntegrationTestResources') {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

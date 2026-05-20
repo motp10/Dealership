@@ -1,7 +1,8 @@
 plugins {
+    id 'org.springframework.boot' version '3.3.5'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'org.graalvm.buildtools.native' version '0.10.3'
     id 'java'
-    id 'org.springframework.boot' version '3.2.3'
-    id 'io.spring.dependency-management' version '1.1.4'
 }
 
 apply plugin: 'application'
@@ -26,19 +27,49 @@ repositories {
 ext {
     mapstructVersion = '1.5.5.Final'
     lombokVersion = '1.18.30'
+    hibernateVersion = '6.4.4.Final'
 }
+
+bootBuildImage {
+    environment = [
+            "BP_NATIVE_IMAGE": "true",
+            "BP_NATIVE_IMAGE_BUILD_ARGUMENTS": "--initialize-at-run-time=ch.qos.logback,io.grpc.netty.shaded.io.netty,org.slf4j --allow-incomplete-classpath",
+            "JAVA_TOOL_OPTIONS": "-Dspring.aot.enabled=true"
+            ]
+}
+
+graalvmNative {
+    binaries {
+        main {
+            buildArgs.add('--initialize-at-run-time=ch.qos.logback.core.util.StatusPrinter2')
+            buildArgs.add('--initialize-at-run-time=ch.qos.logback.core.status.StatusBase')
+            buildArgs.add('--initialize-at-run-time=io.grpc.netty.shaded.io.netty.buffer.UnpooledByteBufAllocator')
+            buildArgs.add('--initialize-at-run-time=io.grpc.netty.shaded.io.netty.channel.epoll.Epoll')
+
+            buildArgs.add('--initialize-at-run-time=io.grpc.netty.shaded.io.netty')
+            buildArgs.add('--initialize-at-run-time=ch.qos.logback')
+            buildArgs.add('--allow-incomplete-classpath')
+
+            buildArgs.add('--initialize-at-run-time=ch.qos.logback,io.grpc.netty.shaded.io.netty,org.slf4j')
+            buildArgs.add('--add-opens=java.base/java.lang=ALL-UNNAMED')
+        }
+    }
+}
+
 
 dependencies {
     implementation project(':commonLib')
+
+    implementation platform('org.springframework.boot:spring-boot-dependencies:3.3.5')
 
     implementation 'io.micrometer:micrometer-tracing-bridge-otel'
     implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-    implementation platform('org.springframework.boot:spring-boot-dependencies:3.2.3')
 
-
-    implementation 'net.devh:grpc-client-spring-boot-starter:3.1.0.RELEASE'
+    implementation 'io.grpc:grpc-netty-shaded:1.62.2'
+    implementation 'io.grpc:grpc-protobuf:1.62.2'
+    implementation 'io.grpc:grpc-stub:1.62.2'
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -49,6 +80,7 @@ dependencies {
     implementation 'org.springframework.kafka:spring-kafka'
 
     implementation 'org.liquibase:liquibase-core'
+
     runtimeOnly 'org.postgresql:postgresql'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0'
 
@@ -59,10 +91,29 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-    id 'org.graalvm.buildtools.native' version '0.10.1'
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+    options.fork = true
+    options.forkOptions.jvmArgs << "--add-opens=java.base/java.lang=ALL-UNNAMED"
+}
+
+tasks.named('processAot') {
+    systemProperty('org.hibernate.validator.fail_fast', 'true')
+}
+
+tasks.withType(org.springframework.boot.gradle.tasks.aot.ProcessAot) {
+    environment "HIBERNATE_VALIDATOR_FAIL_FAST", "true"
+}
+
+configurations.all {
+    resolutionStrategy {
+        eachDependency { DependencyResolveDetails details ->
+            if (details.requested.group == 'org.liquibase' && details.requested.name == 'liquibase-core') {
+                details.useVersion '4.29.1'
+                details.because 'Fixing NoSuchMethodException in Spring Boot 3.3.5 AOT analysis'
+            }
+        }
+    }
 }

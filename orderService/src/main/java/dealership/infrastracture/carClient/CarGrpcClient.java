@@ -7,8 +7,8 @@ import com.autosalon.grpc.CarStorageServiceGrpc;
 import com.autosalon.grpc.Empty;
 import dealership.exceptions.StorageServiceUnavailableException;
 import io.grpc.StatusRuntimeException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,10 +16,10 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class CarGrpcClient {
 
-    @GrpcClient("storage-service")
-    private CarStorageServiceGrpc.CarStorageServiceBlockingStub carStorageStub;
+    private final CarStorageServiceGrpc.CarStorageServiceBlockingStub carStorageStub;
 
     public List<CarResponse> getAvailableCars() {
         log.info("Sending gRPC request to StorageService to get available cars...");

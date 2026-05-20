@@ -1,18 +1,12 @@
-FROM gradle:8-jdk21-alpine AS builder
+FROM ubuntu:jammy
+
+RUN apt-get update && apt-get install -y libz-dev && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
-RUN apk add --no-cache libc6-compat
+COPY orderService/build/native/nativeCompile/orderService /app/app-native
 
-COPY settings.gradle build.gradle ./
-COPY commonLib ./commonLib
-COPY orderService ./orderService
-
-RUN gradle :orderService:bootJar --no-daemon
-
-FROM eclipse-temurin:21-jre-alpine
-WORKDIR /app
-
-COPY --from=builder /app/orderService/build/libs/*.jar app.jar
+RUN chmod +x /app/app-native
 
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["/app/app-native"]
