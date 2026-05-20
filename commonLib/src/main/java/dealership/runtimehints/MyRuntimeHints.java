@@ -64,5 +64,35 @@ public class MyRuntimeHints implements RuntimeHintsRegistrar {
                 org.springframework.aot.hint.MemberCategory.INVOKE_DECLARED_METHODS,
                 org.springframework.aot.hint.MemberCategory.INVOKE_PUBLIC_METHODS
         );
+
+        hints.reflection().registerType(
+                TypeReference.of("io.opentelemetry.api.internal.InstrumentationUtil"),
+                MemberCategory.INVOKE_PUBLIC_METHODS,
+                MemberCategory.INVOKE_DECLARED_METHODS,
+                MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS
+        );
+
+        hints.reflection().registerType(
+                TypeReference.of("io.opentelemetry.instrumentation.api.instrumenter.SpanSuppressors$ByContextKey"),
+                MemberCategory.INVOKE_PUBLIC_METHODS,
+                MemberCategory.INVOKE_DECLARED_METHODS
+        );
+
+        try {
+            hints.reflection().registerType(
+                    Class.forName("io.opentelemetry.api.internal.InstrumentationUtil", false, classLoader),
+                    MemberCategory.values() // Берем вообще ВСЕ (методы, поля, конструкторы)
+            );
+            hints.reflection().registerType(
+                    Class.forName("io.opentelemetry.instrumentation.api.instrumenter.SpanSuppressors$ByContextKey", false, classLoader),
+                    MemberCategory.values()
+            );
+            hints.reflection().registerType(
+                    Class.forName("io.opentelemetry.instrumentation.api.instrumenter.SpanSuppressors", false, classLoader),
+                    MemberCategory.values()
+            );
+        } catch (ClassNotFoundException e) {
+        }
+
     }
 }

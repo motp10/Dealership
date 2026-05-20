@@ -3,7 +3,6 @@ syntax = "proto3";
 option java_package = "com.autosalon.grpc";
 option java_multiple_files = true;
 
-// Сервис для работы со складом автомобилей
 service CarStorageService {
   rpc GetAvailableCars (Empty) returns (CarListResponse);
   rpc GetCarById (CarIdRequest) returns (CarResponse);

@@ -21,13 +21,12 @@ public class GrpcClientConfig {
         int port = parts.length > 1 ? Integer.parseInt(parts[1]) : 9090;
 
         return ManagedChannelBuilder.forAddress(host, port)
-                .usePlaintext() // Отключаем TLS
+                .usePlaintext()
                 .build();
     }
 
     @Bean
     public CarStorageServiceGrpc.CarStorageServiceBlockingStub carStorageServiceBlockingStub(ManagedChannel channel) {
-        // Создаем стандартный синхронный Stub
         return CarStorageServiceGrpc.newBlockingStub(channel);
     }
 }
