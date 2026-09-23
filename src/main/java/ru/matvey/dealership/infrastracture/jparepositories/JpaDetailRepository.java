@@ -10,6 +10,9 @@ import ru.matvey.dealership.domain.details.Detail;
 
 @Repository
 public interface JpaDetailRepository extends JpaRepository<Detail, UUID> {
+    @Query(value = "SELECT * FROM details WHERE type = :type AND lower(value) = lower(:value) AND removed = false ORDER BY id", nativeQuery = true)
+    List<Detail> findByTypeAndValue(@Param("type") String type, @Param("value") String value);
+
     @Query(
         value = "SELECT * FROM details WHERE type = :type AND removed = false",
         nativeQuery = true

@@ -18,7 +18,8 @@ public class CarDtoMapper {
                 car.getCarPaint().Info().Value(),
                 car.getFuel().Info().Value(),
                 car.getTransmission().Info().Value(),
-                car.getDrivelayout().Info().Value()
+                car.getDrivelayout().Info().Value(),
+                car.getWheel() == null ? null : car.getWheel().Info().Value()
         );
         return dto;
     }

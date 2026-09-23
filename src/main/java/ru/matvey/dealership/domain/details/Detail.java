@@ -30,14 +30,6 @@ public abstract class Detail {
     @Column(name = "type", insertable = false, updatable = false)
     private String type;
 
-    @ElementCollection
-    @CollectionTable(
-        name = "detail_compatibility",
-        joinColumns = @JoinColumn(name = "detail_id")
-    )
-    @Column(name = "model_name")
-    private Set<String> compatibleModels = new HashSet<>();
-
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;
 
@@ -52,13 +44,11 @@ public abstract class Detail {
     protected Detail(
         UUID id,
         String value,
-        double cost,
-        Set<String> compatibleModels
+        double cost
     ) {
         this.id = id;
         this.value = value;
         this.cost = cost;
-        this.compatibleModels = new HashSet<>(compatibleModels);
     }
 
     @PrePersist
@@ -78,13 +68,5 @@ public abstract class Detail {
 
     public double Cost() {
         return cost;
-    }
-
-    public boolean isCompatibleWith(String model) {
-        return compatibleModels.contains(model);
-    }
-
-    public Set<String> CompatibleModels() {
-        return new HashSet<>(compatibleModels);
     }
 }

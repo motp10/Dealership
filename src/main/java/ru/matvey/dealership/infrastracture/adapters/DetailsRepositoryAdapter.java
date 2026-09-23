@@ -34,7 +34,18 @@ public class DetailsRepositoryAdapter implements DetailsRepository {
 
     @Override
     public List<Detail> getDetails(DetailType type) {
-        return jpaDetailRepository.findByType(type.Value().toLowerCase());
+        String discriminator = switch (type) {
+            case ru.matvey.dealership.domain.details.Body.BodyType ignored -> "BODY";
+            case ru.matvey.dealership.domain.details.color.PaintType ignored -> "COLOR";
+            case ru.matvey.dealership.domain.details.fuel.FuelType ignored -> "FUEL";
+            case ru.matvey.dealership.domain.details.Transmission.TransmissionType ignored -> "TRANSMISSION";
+            case ru.matvey.dealership.domain.details.drivelayout.DriveLayoutType ignored -> "DRIVELAYOUT";
+            case ru.matvey.dealership.domain.details.Wheel.WheelType ignored -> "WHEEL";
+            case ru.matvey.dealership.domain.details.Interior.InteriorType ignored -> "INTERIOR";
+            case ru.matvey.dealership.domain.details.SteeringWheel.SteeringWheelType ignored -> "STEERINGWHEEL";
+            default -> throw new IllegalArgumentException("Unsupported detail type");
+        };
+        return jpaDetailRepository.findByTypeAndValue(discriminator, type.Value().trim());
     }
 
     @Override

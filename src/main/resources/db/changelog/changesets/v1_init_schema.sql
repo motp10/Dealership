@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset matvey:1
+--changeset matvey:create-app-users
 CREATE TABLE app_users (
                            id UUID PRIMARY KEY,
                            username VARCHAR(255) UNIQUE NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE app_users (
                            removed BOOLEAN DEFAULT FALSE
 );
 
---changeset matvey:2
+--changeset matvey:create-details
 CREATE TABLE details (
                          id UUID PRIMARY KEY,
                          type VARCHAR(100) NOT NULL,
@@ -23,13 +23,7 @@ CREATE TABLE details (
                          removed BOOLEAN DEFAULT FALSE
 );
 
---changeset matvey:3
-CREATE TABLE detail_compatibility (
-    detail_id UUID NOT NULL REFERENCES details(id) ON DELETE CASCADE,
-    model_name VARCHAR(255) NOT NULL
-);
-
---changeset matvey:4
+--changeset matvey:create-cars
 CREATE TABLE cars (
                       id UUID PRIMARY KEY,
                       brand VARCHAR(255) NOT NULL,
@@ -45,14 +39,14 @@ CREATE TABLE cars (
                       removed BOOLEAN DEFAULT FALSE
 );
 
---changeset matvey:5
+--changeset matvey:create-car-additional-details
 CREATE TABLE car_additional_details (
     car_id UUID NOT NULL REFERENCES cars(id) ON DELETE CASCADE,
     detail_id UUID NOT NULL REFERENCES details(id) ON DELETE CASCADE,
     PRIMARY KEY (car_id, detail_id)
 );
 
---changeset matvey:6
+--changeset matvey:create-complication-orders
 CREATE TABLE complication_orders (
     id UUID PRIMARY KEY,
     client_id UUID REFERENCES app_users(id),
@@ -66,7 +60,7 @@ CREATE TABLE complication_orders (
     removed BOOLEAN DEFAULT FALSE
 );
 
---changeset matvey:7
+--changeset matvey:create-stock-car-orders
 CREATE TABLE stock_car_orders (
     id UUID PRIMARY KEY,
     client_id UUID REFERENCES app_users(id),
@@ -78,7 +72,7 @@ CREATE TABLE stock_car_orders (
     removed BOOLEAN DEFAULT FALSE
 );
 
---changeset matvey:8
+--changeset matvey:create-test-drive-orders
 CREATE TABLE test_drive_orders (
     id UUID PRIMARY KEY,
     client_id UUID REFERENCES app_users(id),

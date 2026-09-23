@@ -1,6 +1,7 @@
 package ru.matvey.dealership.presentation.controllers;
 
 import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import ru.matvey.dealership.contracts.models.CarDto;
 import ru.matvey.dealership.contracts.operations.CarComplictation;
@@ -17,9 +18,9 @@ public class CarsController {
     private final CarService adminService;
 
     @PostMapping
-    public UUID addCar(@RequestBody CarConfigurationRequest request) {
+    public UUID addCar(@Valid @RequestBody CarConfigurationRequest request) {
         CarComplictation complictation = new CarComplictation(
-                0,
+                request.baseCost() == null ? 0 : request.baseCost(),
                 request.brand(),
                 request.model(),
                 request.bodyType(),
@@ -31,9 +32,9 @@ public class CarsController {
         return adminService.addCar(complictation);
     }
     @PatchMapping
-    public void updateCar(@RequestBody CarConfigurationRequest request) {
+    public void updateCar(@Valid @RequestBody CarConfigurationRequest request) {
         CarComplictation complictation = new CarComplictation(
-                0,
+                request.baseCost() == null ? 0 : request.baseCost(),
                 request.brand(),
                 request.model(),
                 request.bodyType(),
@@ -55,7 +56,7 @@ public class CarsController {
     @GetMapping
     public List<CarDto> getCars(@RequestBody CarConfigurationRequest request) {
         CarComplictation complictation = new CarComplictation(
-                0,
+                request.baseCost() == null ? 0 : request.baseCost(),
                 request.brand(),
                 request.model(),
                 request.bodyType(),

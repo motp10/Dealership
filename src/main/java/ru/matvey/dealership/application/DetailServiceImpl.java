@@ -22,7 +22,7 @@ public class DetailServiceImpl implements DetailService {
     @Override
     public UUID addDetail(DetailOperation.Request request) {
         DetailsFactory detailsFactory = new DetailsFactory();
-        Detail detail = detailsFactory.createDetail(request.detailType(), request.detailInfo(), request.price(), request.suitableCars());
+        Detail detail = detailsFactory.createDetail(request.detailType(), request.detailInfo(), request.price());
         detailsRepository.add(detail);
         return detail.getId();
     }
@@ -30,7 +30,7 @@ public class DetailServiceImpl implements DetailService {
     @Override
     public void updateDetail(UUID id, DetailOperation.Request updatedDetail) {
         DetailsFactory factory = new DetailsFactory();
-        Detail detail = factory.createDetail(updatedDetail.detailType(), updatedDetail.detailInfo(), updatedDetail.price(), updatedDetail.suitableCars());
+        Detail detail = factory.createDetail(updatedDetail.detailType(), updatedDetail.detailInfo(), updatedDetail.price());
         detailsRepository.delete(id);
         detailsRepository.add(detail);
     }

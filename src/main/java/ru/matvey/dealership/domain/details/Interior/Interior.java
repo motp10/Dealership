@@ -2,7 +2,6 @@ package ru.matvey.dealership.domain.details.Interior;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import java.util.Set;
 import java.util.UUID;
 import ru.matvey.dealership.domain.details.Cost;
 import ru.matvey.dealership.domain.details.Detail;
@@ -16,19 +15,17 @@ public class Interior extends Detail {
 
     public Interior(
         InteriorType type,
-        Cost cost,
-        Set<String> compatibleModels
+        Cost cost
     ) {
-        super(UUID.randomUUID(), type.Value(), cost.value(), compatibleModels);
+        super(UUID.randomUUID(), type.Value(), cost.value());
     }
 
     public Interior(
         UUID id,
         InteriorType type,
-        Cost cost,
-        Set<String> compatibleModels
+        Cost cost
     ) {
-        super(id, type.Value(), cost.value(), compatibleModels);
+        super(id, type.Value(), cost.value());
     }
 
     @Override

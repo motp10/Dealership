@@ -2,7 +2,6 @@ package ru.matvey.dealership.domain.details.drivelayout;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import java.util.Set;
 import java.util.UUID;
 import ru.matvey.dealership.domain.details.Cost;
 import ru.matvey.dealership.domain.details.Detail;
@@ -16,19 +15,17 @@ public class DriveLayout extends Detail {
 
     public DriveLayout(
         DriveLayoutType type,
-        Cost cost,
-        Set<String> compatibleModels
+        Cost cost
     ) {
-        super(UUID.randomUUID(), type.Value(), cost.value(), compatibleModels);
+        super(UUID.randomUUID(), type.Value(), cost.value());
     }
 
     public DriveLayout(
         UUID id,
         DriveLayoutType type,
-        Cost cost,
-        Set<String> compatibleModels
+        Cost cost
     ) {
-        super(id, type.Value(), cost.value(), compatibleModels);
+        super(id, type.Value(), cost.value());
     }
 
     @Override

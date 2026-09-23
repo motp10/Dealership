@@ -20,8 +20,7 @@ public class DetailController {
         DetailOperation.Request detail = new DetailOperation.Request(
                 request.type,
                 request.information,
-                request.cost,
-                request.compatitiveModels
+                request.cost
         );
         return detailService.addDetail(detail);
     }
@@ -30,8 +29,7 @@ public class DetailController {
         DetailOperation.Request detail = new DetailOperation.Request(
                 request.type,
                 request.information,
-                request.cost,
-                request.compatitiveModels
+                request.cost
         );
         detailService.updateDetail(request.id, detail);
     }

@@ -4,8 +4,8 @@ import ru.matvey.dealership.domain.exceptions.DomainValidationException;
 
 public record Cost(double value) {
     public Cost {
-        if (value < 0) {
-            throw new DomainValidationException("Cost cannot be negative");
+        if (!Double.isFinite(value) || value < 0) {
+            throw new DomainValidationException("Cost must be finite and non-negative");
         }
     }
 }

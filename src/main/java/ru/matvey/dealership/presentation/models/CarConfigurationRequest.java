@@ -1,17 +1,20 @@
 package ru.matvey.dealership.presentation.models;
 
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import java.util.UUID;
 
 public record CarConfigurationRequest(
-        @NotEmpty String brand,
-        @NotEmpty String model,
-        String bodyType,
-        String paint,
-        String fuel,
-        String transmission,
-        String driveLayout,
+        @NotBlank String brand,
+        @NotBlank String model,
+        @NotBlank String bodyType,
+        @NotBlank String paint,
+        @NotBlank String fuel,
+        @NotBlank String transmission,
+        @NotBlank String driveLayout,
         String wheel,
-        UUID clientId
+        UUID clientId,
+        @NotNull @PositiveOrZero Double baseCost
 ) {}

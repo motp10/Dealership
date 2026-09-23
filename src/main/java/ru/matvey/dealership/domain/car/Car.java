@@ -1,6 +1,7 @@
 package ru.matvey.dealership.domain.car;
 
 import jakarta.persistence.*;
+import ru.matvey.dealership.domain.details.Wheel.Wheel;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.Getter;
@@ -47,6 +48,17 @@ public class Car {
     @JoinColumn(name = "drive_layout_id")
     private DriveLayout drivelayout;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "wheel_id")
+    private Wheel wheel;
+
+    public void setWheel(Wheel wheel) {
+        if (wheel == null) {
+            throw new DomainValidationException("wheel must not be null");
+        }
+        this.wheel = wheel;
+    }
+
     @Column(name = "base_cost")
     private double baseCost;
 
@@ -71,27 +83,10 @@ public class Car {
         DriveLayout drivelayout,
         Cost defaultCost
     ) {
-        if (!body.isCompatibleWith(model)) throw new DomainValidationException(
-            "body is not compatible with model"
-        );
-        if (
-            !carPaint.isCompatibleWith(model)
-        ) throw new DomainValidationException(
-            "color is not compatible with model"
-        );
-        if (!fuel.isCompatibleWith(model)) throw new DomainValidationException(
-            "fuel is not compatible with model"
-        );
-        if (
-            !transmission.isCompatibleWith(model)
-        ) throw new DomainValidationException(
-            "transmission is not compatible with model"
-        );
-        if (
-            !drivelayout.isCompatibleWith(model)
-        ) throw new DomainValidationException(
-            "drivelayout is not compatible with model"
-        );
+        if (brand == null || brand.isBlank() || model == null || model.isBlank()) {
+            throw new DomainValidationException("Brand and model must not be blank");
+        }
+        
         this.id = UUID.randomUUID();
         this.brand = brand;
         this.model = model;
@@ -114,27 +109,10 @@ public class Car {
         DriveLayout drivelayout,
         Cost defaultCost
     ) {
-        if (!body.isCompatibleWith(model)) throw new DomainValidationException(
-            "body is not compatible with model"
-        );
-        if (
-            !carPaint.isCompatibleWith(model)
-        ) throw new DomainValidationException(
-            "color is not compatible with model"
-        );
-        if (!fuel.isCompatibleWith(model)) throw new DomainValidationException(
-            "fuel is not compatible with model"
-        );
-        if (
-            !transmission.isCompatibleWith(model)
-        ) throw new DomainValidationException(
-            "transmission is not compatible with model"
-        );
-        if (
-            !drivelayout.isCompatibleWith(model)
-        ) throw new DomainValidationException(
-            "drivelayout is not compatible with model"
-        );
+        if (brand == null || brand.isBlank() || model == null || model.isBlank()) {
+            throw new DomainValidationException("Brand and model must not be blank");
+        }
+
         this.id = id;
         this.brand = brand;
         this.model = model;
@@ -153,7 +131,7 @@ public class Car {
             carPaint.Cost() +
             fuel.Cost() +
             transmission.Cost() +
-            drivelayout.Cost()
+            drivelayout.Cost() + (wheel == null ? 0 : wheel.Cost())
         );
     }
 

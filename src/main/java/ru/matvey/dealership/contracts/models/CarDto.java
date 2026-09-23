@@ -13,7 +13,8 @@ public record CarDto(
         String paint,
         String fuel,
         String transmission,
-        String drivelayout
+        String drivelayout,
+        String wheel
 ) {
     public CarDto(Car car) {
         this(
@@ -25,7 +26,8 @@ public record CarDto(
                 car.getCarPaint().Info().Value(),
                 car.getFuel().Info().Value(),
                 car.getTransmission().Info().Value(),
-                car.getDrivelayout().Info().Value()
+                car.getDrivelayout().Info().Value(),
+                car.getWheel() == null ? null : car.getWheel().Info().Value()
         );
     }
 }

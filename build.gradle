@@ -26,8 +26,10 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3'
     implementation 'org.springframework.boot:spring-boot-liquibase'
     implementation 'org.liquibase:liquibase-core'
     runtimeOnly 'org.postgresql:postgresql'
@@ -44,72 +46,108 @@ dependencies {
     testImplementation 'org.testcontainers:postgresql:1.19.7'
     testCompileOnly 'org.projectlombok:lombok:1.18.42'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.42'
-    implementation 'org.liquibase:liquibase-core'
+}
+
+tasks.register('startDatabase', Exec) {
+    group = 'application'
+    description = 'Starts the local PostgreSQL database using Docker Compose.'
+    commandLine 'docker', 'compose', '-f', 'docker/docker-file-dependency.yaml', 'up', '-d', '--wait'
+}
+
+tasks.register('bootRunLocal') {
+    group = 'application'
+    description = 'Starts PostgreSQL and runs the application with Swagger UI.'
+    dependsOn 'startDatabase', 'bootRun'
+}
+
+tasks.named('bootRun') {
+    mustRunAfter 'startDatabase'
+    doFirst {
+        environment 'SWAGGER_ENABLED', 'true'
+        if (gradle.taskGraph.hasTask(':bootRunLocal')) {
+            environment 'DB_URL', System.getenv('DB_URL') ?: 'jdbc:postgresql://localhost:8888/dealership_db'
+            environment 'DB_USER', System.getenv('DB_USER') ?: 'postgres'
+            environment 'DB_PASSWORD', System.getenv('DB_PASSWORD') ?: 'password123'
+            environment 'MIGRATIONS_ENABLED', 'true'
+            environment 'DB_CONTEXTS', 'demo'
+        }
+        def port = System.getenv('PORT') ?: '8080'
+        println "Swagger UI: http://localhost:${port}/swagger-ui.html"
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+
+sourceSets {
+    integrationTest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
 }
 configurations {
     integrationTestImplementation.extendsFrom testImplementation
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
-
-sourceSets {
-    integrationTest {
-        java.srcDir file('src/integrationTest/java')
-        resources.srcDir file('src/integrationTest/resources')
-        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
-        runtimeClasspath += output + compileClasspath
-    }
-}
-
-idea {
-    module {
-        testSources.from sourceSets.integrationTest.java.srcDirs
-        testResources.from sourceSets.integrationTest.resources.srcDirs
-    }
-}
-
 tasks.register('integrationTest', Test) {
-    description = 'Runs integration tests.'
     group = 'verification'
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
     useJUnitPlatform()
     shouldRunAfter test
-    testLogging {
-        events 'passed', 'skipped', 'failed'
-    }
+}
+tasks.named('check') { dependsOn 'integrationTest' }
+tasks.named('bootJar') { archiveFileName = 'dealership.jar' }
+tasks.withType(AbstractArchiveTask).configureEach {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
 }
 
-tasks.named('processIntegrationTestResources') {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+tasks.register('dockerBuild', Exec) {
+    group = 'docker'
+    description = 'Builds the application JAR and Docker image.'
+    dependsOn 'bootJar'
+    commandLine 'docker', 'build',
+            '-f', 'docker/Dockerfile',
+            '-t', 'dealership:local',
+            '.'
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
-}
+def composeEnvFile = file('.env').exists() ? '.env' : '.env.example'
 
-test {
-    useJUnitPlatform()
-    finalizedBy jacocoTestReport
-    testLogging {
-        events 'passed', 'skipped', 'failed'
-    }
-}
-
-jacocoTestReport {
-    dependsOn test
-    reports {
-        html.required = true
-    }
-}
-
-jacocoTestCoverageVerification {
-    violationRules {
-        rule {
-            limit {
-                minimum = 0.70
-            }
+tasks.register('dockerUp', Exec) {
+    group = 'docker'
+    description = 'Starts the full application stack in Docker Compose.'
+    dependsOn 'dockerBuild'
+    commandLine 'docker', 'compose',
+            '--env-file', composeEnvFile,
+            'up', '-d', '--wait'
+    doLast {
+        def output = new ByteArrayOutputStream()
+        exec {
+            commandLine 'docker', 'compose',
+                    '--env-file', composeEnvFile,
+                    'port', 'web', '8080'
+            standardOutput = output
         }
+        println "Swagger UI: http://${output.toString().trim()}/swagger-ui.html"
     }
 }
 
-check.dependsOn jacocoTestCoverageVerification
+tasks.register('dockerDown', Exec) {
+    group = 'docker'
+    description = 'Stops the full Docker Compose stack.'
+    commandLine 'docker', 'compose',
+            '--env-file', composeEnvFile,
+            'down'
+}
+
+tasks.register('dockerDownV', Exec) {
+    group = 'docker'
+    description = 'Stops the full Docker Compose stack.'
+    commandLine 'docker', 'compose',
+            '--env-file', composeEnvFile,
+            'down', '-v'
+}

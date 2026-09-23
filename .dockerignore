@@ -1,0 +1,6 @@
+**
+!build/
+!build/libs/
+!build/libs/dealership.jar
+!docker/
+!docker/Dockerfile

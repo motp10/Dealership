@@ -1,0 +1,49 @@
+x-app: &app
+  image: ${APP_IMAGE:?Set APP_IMAGE to the built release image}
+  environment: &environment
+    DB_URL: ${DB_URL:?Set DB_URL}
+    DB_USER: ${DB_USER:?Set DB_USER}
+    DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
+    SWAGGER_ENABLED: ${SWAGGER_ENABLED:-false}
+    DB_CONTEXTS: ${DB_CONTEXTS:-}
+    LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    PORT: "8080"
+  stop_grace_period: 30s
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME:-dealership_db}
+      POSTGRES_USER: ${DB_USER:?Set DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
+    volumes:
+      - database:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  migrate:
+    <<: *app
+    command: ["--migrate"]
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+  web:
+    <<: *app
+    ports:
+      - "127.0.0.1::8080"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/actuator/health/readiness"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 20s
+
+volumes:
+  database:
