@@ -1,6 +1,6 @@
 x-app: &app
   image: ${APP_IMAGE:-dealership:local}
-  environment: &environment
+  environment:
     DB_URL: ${DB_URL:-jdbc:postgresql://db:5432/dealership_db}
     DB_USER: ${DB_USER:-postgres}
     DB_PASSWORD: ${DB_PASSWORD:-password123}
