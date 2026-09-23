@@ -1,13 +1,13 @@
 x-app: &app
-  image: ${APP_IMAGE:?Set APP_IMAGE to the built release image}
+  image: ${APP_IMAGE:-dealership:local}
   environment: &environment
-    DB_URL: ${DB_URL:?Set DB_URL}
-    DB_USER: ${DB_USER:?Set DB_USER}
-    DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
+    DB_URL: ${DB_URL:-jdbc:postgresql://db:5432/dealership_db}
+    DB_USER: ${DB_USER:-postgres}
+    DB_PASSWORD: ${DB_PASSWORD:-password123}
     SWAGGER_ENABLED: ${SWAGGER_ENABLED:-false}
     DB_CONTEXTS: ${DB_CONTEXTS:-}
     LOG_LEVEL: ${LOG_LEVEL:-INFO}
-    PORT: "8080"
+    PORT: ${BACKEND_PORT:-8080}
   stop_grace_period: 30s
 
 services:
@@ -15,8 +15,10 @@ services:
     image: postgres:16-alpine
     environment:
       POSTGRES_DB: ${DB_NAME:-dealership_db}
-      POSTGRES_USER: ${DB_USER:?Set DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password123}
+    ports:
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
     volumes:
       - database:/var/lib/postgresql/data
     healthcheck:
@@ -34,16 +36,28 @@ services:
   web:
     <<: *app
     ports:
-      - "127.0.0.1::8080"
+      - "127.0.0.1:${BACKEND_PORT:-8080}:${BACKEND_PORT:-8080}"
     depends_on:
       migrate:
         condition: service_completed_successfully
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/actuator/health/readiness"]
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:${BACKEND_PORT:-8080}/actuator/health/readiness"]
       interval: 5s
       timeout: 3s
       retries: 12
       start_period: 20s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      API_BASE_URL: ${API_BASE_URL:-http://localhost:${BACKEND_PORT:-8080}}
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      web:
+        condition: service_healthy
 
 volumes:
   database:

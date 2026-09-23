@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Автосалон</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="header">
+      <h1>Автосалон</h1>
+      <p>Простой интерфейс для работы с автомобилями, деталями и пользователями</p>
+    </header>
+
+    <main class="layout">
+      <section class="panel">
+        <h2>Добавить автомобиль</h2>
+        <form id="carForm" class="form">
+          <div class="field-row">
+            <label>Бренд<input name="brand" value="Toyota" required /></label>
+            <label>Модель<input name="model" value="Camry" required /></label>
+          </div>
+          <div class="field-row">
+            <label>Кузов<input name="bodyType" value="sedan" required /></label>
+            <label>Цвет<input name="paint" value="черный" required /></label>
+          </div>
+          <div class="field-row">
+            <label>Топливо<input name="fuel" value="petrol" required /></label>
+            <label>Коробка<input name="transmission" value="automatic" required /></label>
+          </div>
+          <div class="field-row">
+            <label>Привод<input name="driveLayout" value="front" required /></label>
+            <label>Колеса<input name="wheel" value="18" /></label>
+          </div>
+          <div class="field-row">
+            <label>Клиент ID<input name="clientId" value="" /></label>
+            <label>Базовая цена<input type="number" name="baseCost" value="3200000" step="0.01" required /></label>
+          </div>
+          <button type="submit">Создать автомобиль</button>
+        </form>
+        <pre id="carResult" class="result">Ожидание ответа…</pre>
+      </section>
+
+      <section class="panel">
+        <h2>Добавить деталь</h2>
+        <form id="detailForm" class="form">
+          <label>Тип<input name="type" value="body" required /></label>
+          <label>Описание<input name="information" value="Седан, 4 двери" required /></label>
+          <label>Стоимость<input type="number" name="cost" value="150000" step="0.01" required /></label>
+          <label>ID детали<input name="id" value="" /></label>
+          <button type="submit">Создать деталь</button>
+        </form>
+        <pre id="detailResult" class="result">Ожидание ответа…</pre>
+      </section>
+
+      <section class="panel">
+        <h2>Добавить пользователя</h2>
+        <form id="userForm" class="form">
+          <label>Имя пользователя<input name="name" value="alex" required /></label>
+          <label>Пароль<input name="password" type="password" value="123456" required /></label>
+          <label>Полное имя<input name="FullName" value="Алексей Иванов" required /></label>
+          <label>Роль<input name="Role" value="client" required /></label>
+          <button type="submit">Создать пользователя</button>
+        </form>
+        <pre id="userResult" class="result">Ожидание ответа…</pre>
+      </section>
+
+      <section class="panel search-panel">
+        <h2>Получить сущность по ID</h2>
+        <div class="field-row search-row">
+          <label>
+            Тип
+            <select id="lookupType">
+              <option value="car">Автомобиль</option>
+              <option value="detail">Деталь</option>
+            </select>
+          </label>
+          <label>
+            ID
+            <input id="lookupId" placeholder="вставьте UUID" value="" />
+          </label>
+        </div>
+        <button id="lookupBtn">Получить</button>
+        <pre id="lookupResult" class="result">Ожидание ответа…</pre>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -133,6 +133,18 @@ tasks.register('dockerUp', Exec) {
             standardOutput = output
         }
         println "Swagger UI: http://${output.toString().trim()}/swagger-ui.html"
+        println "Frontend: http://localhost:3000"
+    }
+}
+
+tasks.register('dockerUpFrontendOnly', Exec) {
+    group = 'docker'
+    description = 'Starts only the frontend container.'
+    commandLine 'docker', 'compose',
+            '--env-file', composeEnvFile,
+            'up', '-d', '--wait', 'frontend'
+    doLast {
+        println "Frontend: http://localhost:3000"
     }
 }
 
