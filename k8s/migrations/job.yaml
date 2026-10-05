@@ -1,0 +1,65 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrations
+spec:
+  backoffLimit: 3
+
+  template:
+    metadata:
+      labels:
+        app: migrations
+
+    spec:
+      restartPolicy: Never
+
+      initContainers:
+        - name: wait-for-postgres
+          image: postgres:16
+
+          env:
+            - name: DB_HOST
+              value: postgres
+
+            - name: DB_PORT
+              value: "5432"
+
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h "$DB_HOST" -p "$DB_PORT"; do
+                echo "Waiting for PostgreSQL..."
+                sleep 2
+              done
+
+      containers:
+        - name: liquibase
+          image: dealership-migrations:local
+          imagePullPolicy: IfNotPresent
+
+          env:
+            - name: DB_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: DB_URL
+
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: DB_USER
+
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secret
+                  key: DB_PASSWORD
+
+          args:
+            - "--url=$(DB_URL)"
+            - "--username=$(DB_USER)"
+            - "--password=$(DB_PASSWORD)"
+            - "--changelog-file=db.changelog-master.xml"
+            - "update"

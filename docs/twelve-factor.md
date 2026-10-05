@@ -26,7 +26,7 @@
 
 ```sh
 ./gradlew check bootJar
-docker build -f docker/Dockerfile -t dealership:local .
+docker build -f docker/services/backend.Dockerfile -t dealership:local .
 ```
 
 `check` включает `test` и `integrationTest`; PostgreSQL для тестов изолирован через Testcontainers.

@@ -110,8 +110,8 @@ tasks.register('dockerBuild', Exec) {
     description = 'Builds the application JAR and Docker image.'
     dependsOn 'bootJar'
     commandLine 'docker', 'build',
-            '-f', 'docker/Dockerfile',
-            '-t', 'dealership:local',
+            '-f', 'docker/services/backend.Dockerfile',
+            '-t', System.getenv('APP_IMAGE'),
             '.'
 }
 
