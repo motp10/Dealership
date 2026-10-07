@@ -1,5 +1,7 @@
 package ru.matvey.dealership.presentation.controllers;
 
+import lombok.extern.slf4j.Slf4j;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.matvey.dealership.contracts.models.DetailDto;
@@ -9,6 +11,7 @@ import ru.matvey.dealership.presentation.models.DetailOperationRequest;
 
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("api/details")
 @RequiredArgsConstructor
@@ -38,7 +41,7 @@ public class DetailController {
         detailService.deleteDetail(id);
     }
     @GetMapping("/{id}")
-    public DetailDto getDetail(@RequestBody UUID id) {
+    public DetailDto getDetail(@PathVariable UUID id) {
         return detailService.getDetail(id);
     }
     @GetMapping

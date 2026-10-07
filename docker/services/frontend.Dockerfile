@@ -4,6 +4,7 @@ RUN apk add --no-cache gettext
 
 COPY . /usr/share/nginx/html
 COPY default.conf.template /etc/nginx/templates/default.conf.template
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 RUN chown -R nginx:nginx /usr/share/nginx/html
 

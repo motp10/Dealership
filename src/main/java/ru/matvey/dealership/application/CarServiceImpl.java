@@ -1,6 +1,7 @@
 package ru.matvey.dealership.application;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.matvey.dealership.domain.details.Detail;
@@ -31,6 +32,7 @@ import ru.matvey.dealership.domain.exceptions.EntityNotFoundException;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -39,26 +41,33 @@ public class CarServiceImpl implements CarService {
     private final CarsRepository carsRepository;
     @Override
     public UUID addCar(CarComplictation complictation) {
-        Body body = selectDetail(new BodyType(complictation.bodyType()), complictation.model(), Body.class);
-        CarPaint color = selectDetail(new PaintType(complictation.color()), complictation.model(), CarPaint.class);
-        Fuel fuel = selectDetail(new FuelType(complictation.fuelType()), complictation.model(), Fuel.class);
-        Transmission transmission = selectDetail(new TransmissionType(complictation.transmissionType()), complictation.model(), Transmission.class);
-        DriveLayout driveLayout = selectDetail(new DriveLayoutType(complictation.drivelayoutType()), complictation.model(), DriveLayout.class);
+        Car car;
+        try {
+            Body body = selectDetail(new BodyType(complictation.bodyType()), complictation.model(), Body.class);
+            CarPaint color = selectDetail(new PaintType(complictation.color()), complictation.model(), CarPaint.class);
+            Fuel fuel = selectDetail(new FuelType(complictation.fuelType()), complictation.model(), Fuel.class);
+            Transmission transmission = selectDetail(new TransmissionType(complictation.transmissionType()), complictation.model(), Transmission.class);
+            DriveLayout driveLayout = selectDetail(new DriveLayoutType(complictation.drivelayoutType()), complictation.model(), DriveLayout.class);
 
-        Car car = new Car(
-                complictation.brand(),
-                complictation.model(),
-                body,
-                color,
-                fuel,
-                transmission,
-                driveLayout,
-                new Cost(complictation.maxPrice())
-        );
-        if (complictation.wheel() != null) {
-            car.setWheel(selectDetail(new WheelType(complictation.wheel()), complictation.model(), Wheel.class));
+            car = new Car(
+                    complictation.brand(),
+                    complictation.model(),
+                    body,
+                    color,
+                    fuel,
+                    transmission,
+                    driveLayout,
+                    new Cost(complictation.maxPrice())
+            );
+            if (complictation.wheel() != null) {
+                car.setWheel(selectDetail(new WheelType(complictation.wheel()), complictation.model(), Wheel.class));
+            }
+        } catch (RuntimeException exception) {
+            log.error("Failed to create car for model {}", complictation.model(), exception);
+            throw exception;
         }
         carsRepository.add(car);
+        log.info("Car {} created successfully", car.getId());
         return car.getId();
     }
 
@@ -76,37 +85,47 @@ public class CarServiceImpl implements CarService {
         carsRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("no such car id: " + id));
 
-        Body body = selectDetail(new BodyType(complictation.bodyType()), complictation.model(), Body.class);
-        CarPaint color = selectDetail(new PaintType(complictation.color()), complictation.model(), CarPaint.class);
-        Fuel fuel = selectDetail(new FuelType(complictation.fuelType()), complictation.model(), Fuel.class);
-        Transmission transmission = selectDetail(new TransmissionType(complictation.transmissionType()), complictation.model(), Transmission.class);
-        DriveLayout driveLayout = selectDetail(new DriveLayoutType(complictation.drivelayoutType()), complictation.model(), DriveLayout.class);
+        Car updated;
+        try {
+            Body body = selectDetail(new BodyType(complictation.bodyType()), complictation.model(), Body.class);
+            CarPaint color = selectDetail(new PaintType(complictation.color()), complictation.model(), CarPaint.class);
+            Fuel fuel = selectDetail(new FuelType(complictation.fuelType()), complictation.model(), Fuel.class);
+            Transmission transmission = selectDetail(new TransmissionType(complictation.transmissionType()), complictation.model(), Transmission.class);
+            DriveLayout driveLayout = selectDetail(new DriveLayoutType(complictation.drivelayoutType()), complictation.model(), DriveLayout.class);
 
-        Car updated = new Car(
-                id,
-                complictation.brand(),
-                complictation.model(),
-                body,
-                color,
-                fuel,
-                transmission,
-                driveLayout,
-                new Cost(complictation.maxPrice())
-        );
-        if (complictation.wheel() != null) {
-            updated.setWheel(selectDetail(new WheelType(complictation.wheel()), complictation.model(), Wheel.class));
+            updated = new Car(
+                    id,
+                    complictation.brand(),
+                    complictation.model(),
+                    body,
+                    color,
+                    fuel,
+                    transmission,
+                    driveLayout,
+                    new Cost(complictation.maxPrice())
+            );
+            if (complictation.wheel() != null) {
+                updated.setWheel(selectDetail(new WheelType(complictation.wheel()), complictation.model(), Wheel.class));
+            }
+        } catch (RuntimeException exception) {
+            log.error("Failed to update car {} from configuration", id, exception);
+            throw exception;
         }
         carsRepository.add(updated);
+        log.info("Car {} updated successfully", id);
     }
 
     @Override
     public void deleteCar(UUID id) {
         carsRepository.delete(id);
+        log.info("Car {} deleted successfully", id);
     }
 
     @Override
     public CarDto getCar(UUID id) {
-        return carsRepository.findById(id).map(CarDtoMapper::toDto).orElseThrow(() -> new EntityNotFoundException("no such car id: " + id));
+        CarDto car = carsRepository.findById(id).map(CarDtoMapper::toDto).orElseThrow(() -> new EntityNotFoundException("no such car id: " + id));
+        log.info("Car {} retrieved successfully", id);
+        return car;
     }
 
     @Override
@@ -122,13 +141,17 @@ public class CarServiceImpl implements CarService {
                 filter.color().isEmpty() ? null : new PaintType(filter.color()),
                 filter.wheel().isEmpty() ? null : new WheelType(filter.wheel())
         );
-        return cars.stream().map(CarDtoMapper::toDto).toList();
+            List<CarDto> result = cars.stream().map(CarDtoMapper::toDto).toList();
+            log.info("Retrieved {} cars matching criteria", result.size());
+            return result;
     }
 
     @Override
     public List<CarDto> getAllCars() {
-        return carsRepository.getAll().stream()
+        List<CarDto> cars = carsRepository.getAll().stream()
                 .map(CarDtoMapper::toDto)
                 .toList();
+        log.info("Retrieved all cars: {} found", cars.size());
+        return cars;
     }
 }

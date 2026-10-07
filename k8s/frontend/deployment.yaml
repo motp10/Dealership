@@ -23,6 +23,10 @@ spec:
 
           ports:
             - containerPort: 80
+          
+          envFrom:  
+            - configMapRef:
+                name: frontend-config
 
           readinessProbe:
             httpGet:

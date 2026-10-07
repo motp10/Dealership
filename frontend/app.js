@@ -1,4 +1,4 @@
-const API_BASE_URL = window.API_BASE_URL || (window.__ENV__ && window.__ENV__.API_BASE_URL) || 'http://localhost:8080';
+const API_BASE_URL = window.API_BASE_URL || (window.__ENV__ && window.__ENV__.API_BASE_URL) || window.APP_CONFIG.API_BASE_URL;
 
 function showResult(elementId, value) {
   const node = document.getElementById(elementId);
@@ -53,7 +53,7 @@ async function createCar(event) {
   };
 
   try {
-    const result = await apiRequest('/api/cars', {
+    const result = await apiRequest('/cars', {
       method: 'POST',
       body: JSON.stringify(payload)
     });
@@ -76,7 +76,7 @@ async function createDetail(event) {
   };
 
   try {
-    const result = await apiRequest('/api/details', {
+    const result = await apiRequest('/details', {
       method: 'POST',
       body: JSON.stringify(payload)
     });
@@ -99,7 +99,7 @@ async function createUser(event) {
   };
 
   try {
-    const result = await apiRequest('/api/users', {
+    const result = await apiRequest('/users', {
       method: 'POST',
       body: JSON.stringify(payload)
     });
@@ -119,7 +119,7 @@ async function lookupEntity() {
   }
 
   try {
-    const result = await apiRequest(`/${type === 'car' ? 'api/cars' : 'api/details'}/${id}`);
+    const result = await apiRequest(`/${type === 'car' ? 'cars' : 'details'}/${id}`);
     showResult('lookupResult', result);
   } catch (error) {
     showResult('lookupResult', `Ошибка: ${error.message}`);

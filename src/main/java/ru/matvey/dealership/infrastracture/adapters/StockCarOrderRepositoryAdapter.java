@@ -1,5 +1,7 @@
 package ru.matvey.dealership.infrastracture.adapters;
 
+import lombok.extern.slf4j.Slf4j;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.matvey.dealership.abstraction.StockCarOrderRepository;
@@ -10,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class StockCarOrderRepositoryAdapter implements StockCarOrderRepository {

@@ -1,6 +1,7 @@
 package ru.matvey.dealership.application;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.matvey.dealership.abstraction.*;
 import ru.matvey.dealership.contracts.mappers.ConfigurationOrderDtoMapper;
@@ -30,6 +31,7 @@ import ru.matvey.dealership.domain.orders.testDriveOrder.TestDriveOrder;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
@@ -41,21 +43,30 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public UUID makeStockCarOrder(MakeOrder.Request request) {
         UUID managerId = userRepository.getRandomManager();
-        OrderStockCar order = new OrderStockCar(request.userId(), request.carId(), managerId);
+        OrderStockCar order;
+        try {
+            order = new OrderStockCar(request.userId(), request.carId(), managerId);
+        } catch (RuntimeException exception) {
+            log.error("Failed to create stock car order for user {} and car {}", request.userId(), request.carId(), exception);
+            throw exception;
+        }
         stockCarOrderRepository.addOrder(order);
+        log.info("Stock car order {} created successfully", order.getId());
         return order.getId();
     }
 
 
     @Override
     public UUID makeOrderWithConfiguration(CarComplictation request, UUID clientId) {
-        Body body = (Body) detailsRepository.getDetails(new BodyType(request.bodyType())).getFirst();
-        CarPaint carPaint = (CarPaint) detailsRepository.getDetails(new PaintType(request.color())).getFirst();
-        Fuel fuel = (Fuel) detailsRepository.getDetails(new FuelType(request.fuelType())).getFirst();
-        Transmission transmission = (Transmission) detailsRepository.getDetails(new TransmissionType(request.transmissionType())).getFirst();
-        DriveLayout drivelayout = (DriveLayout) detailsRepository.getDetails(new DriveLayoutType(request.drivelayoutType())).getFirst();
+        Car car;
+        try {
+            Body body = (Body) detailsRepository.getDetails(new BodyType(request.bodyType())).getFirst();
+            CarPaint carPaint = (CarPaint) detailsRepository.getDetails(new PaintType(request.color())).getFirst();
+            Fuel fuel = (Fuel) detailsRepository.getDetails(new FuelType(request.fuelType())).getFirst();
+            Transmission transmission = (Transmission) detailsRepository.getDetails(new TransmissionType(request.transmissionType())).getFirst();
+            DriveLayout drivelayout = (DriveLayout) detailsRepository.getDetails(new DriveLayoutType(request.drivelayoutType())).getFirst();
 
-        Car car = new Car(
+            car = new Car(
                 request.brand(),
                 request.model(),
                 body,
@@ -64,57 +75,87 @@ public class OrderServiceImpl implements OrderService {
                 transmission,
                 drivelayout,
                 new Cost(100)
-        );
+            );
+        } catch (RuntimeException exception) {
+            log.error("Failed to create configured car for client {}", clientId, exception);
+            throw exception;
+        }
 
         UUID managerId = userRepository.getRandomManager();
-        ConfigurationOrder order = new ConfigurationOrder(clientId, car, managerId);
+        ConfigurationOrder order;
+        try {
+            order = new ConfigurationOrder(clientId, car, managerId);
+        } catch (RuntimeException exception) {
+            log.error("Failed to create configuration order for client {}", clientId, exception);
+            throw exception;
+        }
 
         complictaionOrderRepository.add(order);
+        log.info("Configuration order {} created successfully for client {}", order.getId(), clientId);
         return order.getId();
     }
 
     @Override
     public UUID makeTestDriveOrder(MakeOrder.Request request) {
         UUID managerId = userRepository.getRandomManager();
-        TestDriveOrder order = new TestDriveOrder(request.userId(), request.carId(), managerId);
+        TestDriveOrder order;
+        try {
+            order = new TestDriveOrder(request.userId(), request.carId(), managerId);
+        } catch (RuntimeException exception) {
+            log.error("Failed to create test drive order for user {} and car {}", request.userId(), request.carId(), exception);
+            throw exception;
+        }
         testDriveRepository.add(order);
+        log.info("Test drive order {} created successfully", order.getId());
         return order.getId();
     }
 
     @Override
     public ConfigurationOrderDto getConfigurationOrder(UUID id) {
-        return complictaionOrderRepository.findById(id).map(ConfigurationOrderDtoMapper::toDto).orElseThrow(() -> new EntityNotFoundException("no order with this id:" + id));
+        ConfigurationOrderDto order = complictaionOrderRepository.findById(id).map(ConfigurationOrderDtoMapper::toDto).orElseThrow(() -> new EntityNotFoundException("no order with this id:" + id));
+        log.info("Configuration order {} retrieved successfully", id);
+        return order;
     }
 
     @Override
     public List<ConfigurationOrderDto> getAllConfigurationOrders() {
-        return complictaionOrderRepository.getAll().stream()
+        List<ConfigurationOrderDto> orders = complictaionOrderRepository.getAll().stream()
                 .map(ConfigurationOrderDtoMapper::toDto)
                 .toList();
+        log.info("Retrieved all configuration orders: {} found", orders.size());
+        return orders;
     }
 
     @Override
     public OrderDto getStockCarOrder(UUID id) {
-        return stockCarOrderRepository.findById(id).map(OrderDtoMapper::toDto).orElseThrow(() -> new EntityNotFoundException("no order with this id:" + id));
+        OrderDto order = stockCarOrderRepository.findById(id).map(OrderDtoMapper::toDto).orElseThrow(() -> new EntityNotFoundException("no order with this id:" + id));
+        log.info("Stock car order {} retrieved successfully", id);
+        return order;
     }
 
     @Override
     public List<OrderDto> getAllStockCarOrders() {
-        return stockCarOrderRepository.getAll().stream()
+        List<OrderDto> orders = stockCarOrderRepository.getAll().stream()
                 .map(OrderDtoMapper::toDto)
                 .toList();
+        log.info("Retrieved all stock car orders: {} found", orders.size());
+        return orders;
     }
 
     @Override
     public OrderDto getTestDriveOrder(UUID id) {
-        return testDriveRepository.findById(id).map(OrderDtoMapper::toDto).orElseThrow(() -> new EntityNotFoundException("no order with this id:" + id));
+        OrderDto order = testDriveRepository.findById(id).map(OrderDtoMapper::toDto).orElseThrow(() -> new EntityNotFoundException("no order with this id:" + id));
+        log.info("Test drive order {} retrieved successfully", id);
+        return order;
     }
 
     @Override
     public List<OrderDto> getAllTestDriveOrders() {
-        return testDriveRepository.getAll().stream()
+        List<OrderDto> orders = testDriveRepository.getAll().stream()
                 .map(OrderDtoMapper::toDto)
                 .toList();
+        log.info("Retrieved all test drive orders: {} found", orders.size());
+        return orders;
     }
 
     @Override
@@ -123,6 +164,7 @@ public class OrderServiceImpl implements OrderService {
         stockCarOrderRepository.findById(id).ifPresent(order -> order.nextStep());
         testDriveRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("no order with this id:" + id)).nextStep();
+        log.info("Order {} status advanced successfully", id);
     }
 
     @Override
@@ -131,5 +173,6 @@ public class OrderServiceImpl implements OrderService {
         stockCarOrderRepository.findById(id).ifPresent(order -> order.cancel());
         testDriveRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("no order with this id:" + id)).cancel();
+        log.info("Order {} cancelled successfully", id);
     }
 }

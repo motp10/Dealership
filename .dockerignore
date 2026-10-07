@@ -10,3 +10,4 @@ docs/
 .env.*
 !.env.example
 **/.DS_Store
+config.js

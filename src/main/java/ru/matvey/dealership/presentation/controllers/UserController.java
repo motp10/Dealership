@@ -1,5 +1,7 @@
 package ru.matvey.dealership.presentation.controllers;
 
+import lombok.extern.slf4j.Slf4j;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.matvey.dealership.contracts.services.UserService;
@@ -7,6 +9,7 @@ import ru.matvey.dealership.presentation.models.UserRequest;
 
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("api/users")
 @RequiredArgsConstructor
