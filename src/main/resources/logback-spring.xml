@@ -1,19 +1,39 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <appender name="CONSOLE"
+    <springProperty
+            scope="context"
+            name="serviceName"
+            source="spring.application.name"
+            defaultValue="dealership"/>
+
+    <springProperty
+            scope="context"
+            name="environment"
+            source="spring.profiles.active"
+            defaultValue="local"/>
+
+    <appender name="JSON_CONSOLE"
               class="ch.qos.logback.core.ConsoleAppender">
 
-        <encoder>
-            <pattern>
-                %d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n
-            </pattern>
-        </encoder>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
 
+            <fieldNames>
+                <timestamp>timestamp</timestamp>
+            </fieldNames>
+
+            <timeZone>UTC</timeZone>
+
+            <customFields>
+                {"service":"${serviceName}","environment":"${environment}"}
+            </customFields>
+
+        </encoder>
     </appender>
 
     <root level="INFO">
-        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="JSON_CONSOLE"/>
     </root>
 
 </configuration>
