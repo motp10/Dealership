@@ -1,4 +1,3 @@
-
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
@@ -18,18 +17,9 @@
               class="ch.qos.logback.core.ConsoleAppender">
 
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-
-            <fieldNames>
-                <timestamp>timestamp</timestamp>
-            </fieldNames>
-
-            <timeZone>UTC</timeZone>
-
-            <customFields>
-                {"service":"${serviceName}","environment":"${environment}"}
-            </customFields>
-
+            <customFields>{"service":"${serviceName}","environment":"${environment}"}</customFields>
         </encoder>
+
     </appender>
 
     <root level="INFO">

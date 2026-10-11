@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 @Slf4j
 @Repository
 @RequiredArgsConstructor
@@ -21,21 +23,87 @@ public class ConfigurationOrderRepositoryAdapter implements ComplictaionOrderRep
 
     @Override
     public void add(ConfigurationOrder order) {
-        jpaRepository.save(order);
+        try {
+            jpaRepository.save(order);
+        } catch (RuntimeException exception) {
+            log.error("Failed to save configuration order",
+                    kv("component", "repository-adapter"),
+                    kv("adapter_name", "ConfigurationOrderRepositoryAdapter"),
+                    kv("operation", "save"),
+                    kv("orderId", order.getId()),
+                    kv("errorType", exception.getClass().getSimpleName()),
+                    exception);
+            throw exception;
+        }
+        log.info("Configuration order saved",
+                kv("component", "repository-adapter"),
+                kv("adapter_name", "ConfigurationOrderRepositoryAdapter"),
+                kv("operation", "save"),
+                kv("orderId", order.getId()));
     }
 
     @Override
     public void delete(UUID orderId) {
-        jpaRepository.deleteById(orderId);
+        try {
+            jpaRepository.deleteById(orderId);
+        } catch (RuntimeException exception) {
+            log.error("Failed to delete configuration order",
+                    kv("component", "repository-adapter"),
+                    kv("adapter_name", "ConfigurationOrderRepositoryAdapter"),
+                    kv("operation", "delete"),
+                    kv("orderId", orderId),
+                    kv("errorType", exception.getClass().getSimpleName()),
+                    exception);
+            throw exception;
+        }
+        log.info("Configuration order deleted",
+                kv("component", "repository-adapter"),
+                kv("adapter_name", "ConfigurationOrderRepositoryAdapter"),
+                kv("operation", "delete"),
+                kv("orderId", orderId));
     }
 
     @Override
     public Optional<ConfigurationOrder> findById(UUID orderId) {
-        return jpaRepository.findById(orderId);
+        try {
+            Optional<ConfigurationOrder> order = jpaRepository.findById(orderId);
+            log.debug("Configuration order lookup completed",
+                    kv("component", "repository-adapter"),
+                    kv("adapter_name", "ConfigurationOrderRepositoryAdapter"),
+                    kv("operation", "findById"),
+                    kv("orderId", orderId),
+                    kv("found", order.isPresent()));
+            return order;
+        } catch (RuntimeException exception) {
+            log.error("Failed to find configuration order",
+                    kv("component", "repository-adapter"),
+                    kv("adapter_name", "ConfigurationOrderRepositoryAdapter"),
+                    kv("operation", "findById"),
+                    kv("orderId", orderId),
+                    kv("errorType", exception.getClass().getSimpleName()),
+                    exception);
+            throw exception;
+        }
     }
 
     @Override
     public List<ConfigurationOrder> getAll() {
-        return jpaRepository.findAll();
+        try {
+            List<ConfigurationOrder> orders = jpaRepository.findAll();
+            log.debug("Configuration orders retrieved",
+                    kv("component", "repository-adapter"),
+                    kv("adapter_name", "ConfigurationOrderRepositoryAdapter"),
+                    kv("operation", "findAll"),
+                    kv("count", orders.size()));
+            return orders;
+        } catch (RuntimeException exception) {
+            log.error("Failed to retrieve configuration orders",
+                    kv("component", "repository-adapter"),
+                    kv("adapter_name", "ConfigurationOrderRepositoryAdapter"),
+                    kv("operation", "findAll"),
+                    kv("errorType", exception.getClass().getSimpleName()),
+                    exception);
+            throw exception;
+        }
     }
 }

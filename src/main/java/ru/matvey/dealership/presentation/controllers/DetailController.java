@@ -11,6 +11,8 @@ import ru.matvey.dealership.presentation.models.DetailOperationRequest;
 
 import java.util.UUID;
 
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 @Slf4j
 @RestController
 @RequestMapping("api/details")
@@ -25,7 +27,14 @@ public class DetailController {
                 request.information,
                 request.cost
         );
-        return detailService.addDetail(detail);
+        UUID detailId = detailService.addDetail(detail);
+        log.info("Detail creation request completed",
+            kv("component", "presentation-controller"),
+            kv("controller_name", "DetailController"),
+            kv("operation", "create"),
+            kv("detailId", detailId),
+            kv("detailType", request.type));
+        return detailId;
     }
     @PatchMapping
     public void updateDetail(@RequestBody DetailOperationRequest request) {
@@ -35,17 +44,39 @@ public class DetailController {
                 request.cost
         );
         detailService.updateDetail(request.id, detail);
+        log.info("Detail update request completed",
+            kv("component", "presentation-controller"),
+            kv("controller_name", "DetailController"),
+            kv("operation", "update"),
+            kv("detailId", request.id),
+            kv("detailType", request.type));
     }
     @DeleteMapping
     public void deleteDetail(@RequestBody UUID id) {
         detailService.deleteDetail(id);
+        log.info("Detail deletion request completed",
+            kv("component", "presentation-controller"),
+            kv("controller_name", "DetailController"),
+            kv("operation", "delete"),
+            kv("detailId", id));
     }
     @GetMapping("/{id}")
     public DetailDto getDetail(@PathVariable UUID id) {
-        return detailService.getDetail(id);
+        DetailDto detail = detailService.getDetail(id);
+        log.debug("Detail retrieval request completed",
+            kv("component", "presentation-controller"),
+            kv("controller_name", "DetailController"),
+            kv("operation", "getById"),
+            kv("detailId", id));
+        return detail;
     }
     @GetMapping
     public void getAllDetails() {
-        detailService.getAllDetails();
+        int count = detailService.getAllDetails().size();
+        log.debug("Detail list request completed",
+            kv("component", "presentation-controller"),
+            kv("controller_name", "DetailController"),
+            kv("operation", "getAll"),
+            kv("count", count));
     }
 }

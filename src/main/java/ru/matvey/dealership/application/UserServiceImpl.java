@@ -35,6 +35,7 @@ public class UserServiceImpl implements UserService {
         } catch (RuntimeException exception) {
             log.warn(
                     "Failed to construct user",
+                    kv("service_name", "UserService"),
                     kv("username", username),
                     kv("role", role),
                     kv("errorType", exception.getClass().getSimpleName()),
@@ -47,6 +48,7 @@ public class UserServiceImpl implements UserService {
 
         log.info(
                 "User created successfully",
+            kv("service_name", "UserService"),
                 kv("userId", user.getId()),
                 kv("role", role)
         );
@@ -61,11 +63,13 @@ public class UserServiceImpl implements UserService {
 
             log.info(
                     "User deleted successfully",
+                    kv("service_name", "UserService"),
                     kv("userId", id)
             );
         } catch (RuntimeException exception) {
             log.error(
                     "Failed to delete user",
+                    kv("service_name", "UserService"),
                     kv("userId", id),
                     kv("errorType", exception.getClass().getSimpleName()),
                     exception

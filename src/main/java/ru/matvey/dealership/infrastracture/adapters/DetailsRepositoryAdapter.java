@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 @Slf4j
 @Repository
 @RequiredArgsConstructor
@@ -22,17 +24,67 @@ public class DetailsRepositoryAdapter implements DetailsRepository {
 
     @Override
     public void add(Detail detail) {
-        jpaDetailRepository.save(detail);
+        try {
+            jpaDetailRepository.save(detail);
+        } catch (RuntimeException exception) {
+            log.error("Failed to save detail",
+                    kv("component", "repository-adapter"),
+                    kv("adapter_name", "DetailsRepositoryAdapter"),
+                    kv("operation", "save"),
+                    kv("detailId", detail.getId()),
+                    kv("detailType", detail.getClass().getSimpleName()),
+                    kv("errorType", exception.getClass().getSimpleName()),
+                    exception);
+            throw exception;
+        }
+        log.info("Detail saved",
+                kv("component", "repository-adapter"),
+                kv("adapter_name", "DetailsRepositoryAdapter"),
+                kv("operation", "save"),
+                kv("detailId", detail.getId()),
+                kv("detailType", detail.getClass().getSimpleName()));
     }
 
     @Override
     public void delete(UUID id) {
-        jpaDetailRepository.deleteById(id);
+        try {
+            jpaDetailRepository.deleteById(id);
+        } catch (RuntimeException exception) {
+            log.error("Failed to delete detail",
+                    kv("component", "repository-adapter"),
+                    kv("adapter_name", "DetailsRepositoryAdapter"),
+                    kv("operation", "delete"),
+                    kv("detailId", id),
+                    kv("errorType", exception.getClass().getSimpleName()),
+                    exception);
+            throw exception;
+        }
+        log.info("Detail deleted",
+                kv("component", "repository-adapter"),
+                kv("adapter_name", "DetailsRepositoryAdapter"),
+                kv("operation", "delete"),
+                kv("detailId", id));
     }
 
     @Override
     public List<Detail> getDetails() {
-        return jpaDetailRepository.findAll();
+        try {
+            List<Detail> details = jpaDetailRepository.findAll();
+            log.debug("Details retrieved",
+                    kv("component", "repository-adapter"),
+                    kv("adapter_name", "DetailsRepositoryAdapter"),
+                    kv("operation", "findAll"),
+                    kv("count", details.size()));
+            return details;
+        } catch (RuntimeException exception) {
+            log.error("Failed to retrieve details",
+                    kv("component", "repository-adapter"),
+                    kv("adapter_name", "DetailsRepositoryAdapter"),
+                    kv("operation", "findAll"),
+                    kv("errorType", exception.getClass().getSimpleName()),
+                    exception);
+            throw exception;
+        }
     }
 
     @Override
@@ -48,11 +100,50 @@ public class DetailsRepositoryAdapter implements DetailsRepository {
             case ru.matvey.dealership.domain.details.SteeringWheel.SteeringWheelType ignored -> "STEERINGWHEEL";
             default -> throw new IllegalArgumentException("Unsupported detail type");
         };
-        return jpaDetailRepository.findByTypeAndValue(discriminator, type.Value().trim());
+        try {
+            List<Detail> details = jpaDetailRepository.findByTypeAndValue(
+                discriminator,
+                type.Value().trim()
+            );
+            log.debug("Details retrieved by type and value",
+                kv("component", "repository-adapter"),
+                kv("adapter_name", "DetailsRepositoryAdapter"),
+                kv("operation", "findByTypeAndValue"),
+                kv("detailType", discriminator),
+                kv("count", details.size()));
+            return details;
+        } catch (RuntimeException exception) {
+            log.error("Failed to retrieve details by type and value",
+                kv("component", "repository-adapter"),
+                kv("adapter_name", "DetailsRepositoryAdapter"),
+                kv("operation", "findByTypeAndValue"),
+                kv("detailType", discriminator),
+                kv("errorType", exception.getClass().getSimpleName()),
+                exception);
+            throw exception;
+        }
     }
 
     @Override
     public Optional<Detail> findById(UUID id) {
-        return jpaDetailRepository.findById(id);
+        try {
+            Optional<Detail> detail = jpaDetailRepository.findById(id);
+            log.debug("Detail lookup completed",
+                    kv("component", "repository-adapter"),
+                    kv("adapter_name", "DetailsRepositoryAdapter"),
+                    kv("operation", "findById"),
+                    kv("detailId", id),
+                    kv("found", detail.isPresent()));
+            return detail;
+        } catch (RuntimeException exception) {
+            log.error("Failed to find detail",
+                    kv("component", "repository-adapter"),
+                    kv("adapter_name", "DetailsRepositoryAdapter"),
+                    kv("operation", "findById"),
+                    kv("detailId", id),
+                    kv("errorType", exception.getClass().getSimpleName()),
+                    exception);
+            throw exception;
+        }
     }
 }

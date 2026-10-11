@@ -57,7 +57,7 @@ public class SomeTest extends BaseIntegrationTest {
         String targetModel = "Camry";
 
         UUID detailId = detailService.addDetail(
-                new DetailOperation.Request("body", "Sedan", 1500.0, Set.of(targetModel))
+                new DetailOperation.Request("body", "Sedan", 1500.0)
         );
 
         var detail = detailService.getDetail(detailId);

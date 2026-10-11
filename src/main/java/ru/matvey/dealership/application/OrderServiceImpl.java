@@ -33,6 +33,8 @@ import ru.matvey.dealership.domain.orders.testDriveOrder.TestDriveOrder;
 import java.util.List;
 import java.util.UUID;
 
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -57,18 +59,34 @@ public class OrderServiceImpl implements OrderService {
             );
         } catch (RuntimeException exception) {
             log.error(
-                    "Failed to create stock car order for user **** and car {}",
-                    request.carId(),
+                    "Failed to create stock car order",
+                    kv("service_name", "OrderService"),
+                    kv("carId", request.carId()),
+                    kv("errorType", exception.getClass().getSimpleName()),
                     exception
             );
             throw exception;
         }
 
-        stockCarOrderRepository.addOrder(order);
+        try {
+            stockCarOrderRepository.addOrder(order);
+        } catch (RuntimeException exception) {
+            log.error(
+                    "Failed to persist stock car order",
+                    kv("service_name", "OrderService"),
+                    kv("orderId", order.getId()),
+                    kv("carId", request.carId()),
+                    kv("errorType", exception.getClass().getSimpleName()),
+                    exception
+            );
+            throw exception;
+        }
 
         log.info(
-                "Stock car order {} created successfully",
-                order.getId()
+                "Stock car order created successfully",
+                kv("service_name", "OrderService"),
+                kv("orderId", order.getId()),
+                kv("carId", request.carId())
         );
 
         return order.getId();
@@ -115,7 +133,11 @@ public class OrderServiceImpl implements OrderService {
 
         } catch (RuntimeException exception) {
             log.error(
-                    "Failed to create configured car for client ****",
+                    "Failed to build configured car",
+                    kv("service_name", "OrderService"),
+                    kv("brand", request.brand()),
+                    kv("model", request.model()),
+                    kv("errorType", exception.getClass().getSimpleName()),
                     exception
             );
             throw exception;
@@ -128,17 +150,35 @@ public class OrderServiceImpl implements OrderService {
             order = new ConfigurationOrder(clientId, car, managerId);
         } catch (RuntimeException exception) {
             log.error(
-                    "Failed to create configuration order for client ****",
+                    "Failed to create configuration order",
+                    kv("service_name", "OrderService"),
+                    kv("brand", request.brand()),
+                    kv("model", request.model()),
+                    kv("errorType", exception.getClass().getSimpleName()),
                     exception
             );
             throw exception;
         }
 
-        complictaionOrderRepository.add(order);
+        try {
+            complictaionOrderRepository.add(order);
+        } catch (RuntimeException exception) {
+            log.error(
+                    "Failed to persist configuration order",
+                    kv("service_name", "OrderService"),
+                    kv("orderId", order.getId()),
+                    kv("model", request.model()),
+                    kv("errorType", exception.getClass().getSimpleName()),
+                    exception
+            );
+            throw exception;
+        }
 
         log.info(
-                "Configuration order {} created successfully for client ****",
-                order.getId()
+                "Configuration order created successfully",
+                kv("service_name", "OrderService"),
+                kv("orderId", order.getId()),
+                kv("model", request.model())
         );
 
         return order.getId();
@@ -157,18 +197,34 @@ public class OrderServiceImpl implements OrderService {
             );
         } catch (RuntimeException exception) {
             log.error(
-                    "Failed to create test drive order for user **** and car {}",
-                    request.carId(),
+                    "Failed to create test drive order",
+                    kv("service_name", "OrderService"),
+                    kv("carId", request.carId()),
+                    kv("errorType", exception.getClass().getSimpleName()),
                     exception
             );
             throw exception;
         }
 
-        testDriveRepository.add(order);
+        try {
+            testDriveRepository.add(order);
+        } catch (RuntimeException exception) {
+            log.error(
+                    "Failed to persist test drive order",
+                    kv("service_name", "OrderService"),
+                    kv("orderId", order.getId()),
+                    kv("carId", request.carId()),
+                    kv("errorType", exception.getClass().getSimpleName()),
+                    exception
+            );
+            throw exception;
+        }
 
         log.info(
-                "Test drive order {} created successfully",
-                order.getId()
+                "Test drive order created successfully",
+                kv("service_name", "OrderService"),
+                kv("orderId", order.getId()),
+                kv("carId", request.carId())
         );
 
         return order.getId();
@@ -183,7 +239,11 @@ public class OrderServiceImpl implements OrderService {
                         new EntityNotFoundException("no order with this id:" + id)
                 );
 
-        log.info("Configuration order {} retrieved successfully", id);
+        log.info(
+                "Configuration order retrieved successfully",
+                kv("service_name", "OrderService"),
+                kv("orderId", id)
+        );
         return order;
     }
 
@@ -196,8 +256,9 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
 
         log.info(
-                "Retrieved all configuration orders: {} found",
-                orders.size()
+                "Retrieved all configuration orders",
+                kv("service_name", "OrderService"),
+                kv("count", orders.size())
         );
 
         return orders;
@@ -212,7 +273,11 @@ public class OrderServiceImpl implements OrderService {
                         new EntityNotFoundException("no order with this id:" + id)
                 );
 
-        log.info("Stock car order {} retrieved successfully", id);
+        log.info(
+                "Stock car order retrieved successfully",
+                kv("service_name", "OrderService"),
+                kv("orderId", id)
+        );
         return order;
     }
 
@@ -225,8 +290,9 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
 
         log.info(
-                "Retrieved all stock car orders: {} found",
-                orders.size()
+                "Retrieved all stock car orders",
+                kv("service_name", "OrderService"),
+                kv("count", orders.size())
         );
 
         return orders;
@@ -241,7 +307,11 @@ public class OrderServiceImpl implements OrderService {
                         new EntityNotFoundException("no order with this id:" + id)
                 );
 
-        log.info("Test drive order {} retrieved successfully", id);
+        log.info(
+                "Test drive order retrieved successfully",
+                kv("service_name", "OrderService"),
+                kv("orderId", id)
+        );
         return order;
     }
 
@@ -254,8 +324,9 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
 
         log.info(
-                "Retrieved all test drive orders: {} found",
-                orders.size()
+                "Retrieved all test drive orders",
+                kv("service_name", "OrderService"),
+                kv("count", orders.size())
         );
 
         return orders;
@@ -278,7 +349,11 @@ public class OrderServiceImpl implements OrderService {
                 )
                 .nextStep();
 
-        log.info("Order {} status advanced successfully", id);
+        log.info(
+                "Order status advanced successfully",
+                kv("service_name", "OrderService"),
+                kv("orderId", id)
+        );
     }
 
     @Override
@@ -298,6 +373,10 @@ public class OrderServiceImpl implements OrderService {
                 )
                 .cancel();
 
-        log.info("Order {} cancelled successfully", id);
+        log.info(
+                "Order cancelled successfully",
+                kv("service_name", "OrderService"),
+                kv("orderId", id)
+        );
     }
 }

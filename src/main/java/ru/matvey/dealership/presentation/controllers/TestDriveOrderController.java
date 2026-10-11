@@ -12,6 +12,8 @@ import ru.matvey.dealership.presentation.models.MakeOrderRequest;
 import java.util.List;
 import java.util.UUID;
 
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/testDrive")
@@ -22,22 +24,51 @@ public class TestDriveOrderController {
     @PostMapping
     public UUID makeOrder(@RequestBody MakeOrderRequest request) {
         MakeOrder.Request orderRequest = new MakeOrder.Request(request.clientId(), request.carId());
-        return orderService.makeTestDriveOrder(orderRequest);
+        UUID orderId = orderService.makeTestDriveOrder(orderRequest);
+        log.info("Test drive order request completed",
+            kv("component", "presentation-controller"),
+            kv("controller_name", "TestDriveOrderController"),
+            kv("operation", "create"),
+            kv("orderId", orderId),
+            kv("carId", request.carId()));
+        return orderId;
     }
     @PatchMapping("/update")
     public void updateOrderStatus(@RequestBody UUID id) {
         orderService.updateOrderStatus(id);
+        log.info("Test drive order status update request completed",
+            kv("component", "presentation-controller"),
+            kv("controller_name", "TestDriveOrderController"),
+            kv("operation", "advanceStatus"),
+            kv("orderId", id));
     }
     @PatchMapping("/cancel")
     public void cancelOrder(@RequestBody UUID id) {
         orderService.cancelOrder(id);
+        log.info("Test drive order cancellation request completed",
+            kv("component", "presentation-controller"),
+            kv("controller_name", "TestDriveOrderController"),
+            kv("operation", "cancel"),
+            kv("orderId", id));
     }
     @GetMapping("/{id}")
     public OrderDto getOrder(@RequestBody UUID id) {
-        return orderService.getTestDriveOrder(id);
+        OrderDto order = orderService.getTestDriveOrder(id);
+        log.debug("Test drive order retrieval request completed",
+            kv("component", "presentation-controller"),
+            kv("controller_name", "TestDriveOrderController"),
+            kv("operation", "getById"),
+            kv("orderId", id));
+        return order;
     }
     @GetMapping
     public List<OrderDto> getAllOrders() {
-        return orderService.getAllTestDriveOrders();
+        List<OrderDto> orders = orderService.getAllTestDriveOrders();
+        log.debug("Test drive order list request completed",
+            kv("component", "presentation-controller"),
+            kv("controller_name", "TestDriveOrderController"),
+            kv("operation", "getAll"),
+            kv("count", orders.size()));
+        return orders;
     }
 }

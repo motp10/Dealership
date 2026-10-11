@@ -101,6 +101,7 @@ public class CarServiceImpl implements CarService {
         } catch (DomainValidationException exception) {
             log.warn(
                     "Car configuration validation failed",
+                    kv("service_name", "CarService"),
                     kv("model", complictation.model()),
                     kv("errorType", exception.getClass().getSimpleName()),
                     exception
@@ -109,6 +110,7 @@ public class CarServiceImpl implements CarService {
         } catch (RuntimeException exception) {
             log.error(
                     "Failed to build car",
+                    kv("service_name", "CarService"),
                     kv("model", complictation.model()),
                     kv("brand", complictation.brand()),
                     kv("errorType", exception.getClass().getSimpleName()),
@@ -122,6 +124,7 @@ public class CarServiceImpl implements CarService {
         } catch (RuntimeException exception) {
             log.error(
                     "Failed to save car",
+                    kv("service_name", "CarService"),
                     kv("carId", car.getId()),
                     kv("model", car.getModel()),
                     kv("errorType", exception.getClass().getSimpleName()),
@@ -132,6 +135,7 @@ public class CarServiceImpl implements CarService {
 
         log.info(
                 "Car created successfully",
+                kv("service_name", "CarService"),
                 kv("carId", car.getId()),
                 kv("brand", car.getBrand()),
                 kv("model", car.getModel())
@@ -161,6 +165,7 @@ public class CarServiceImpl implements CarService {
                 .orElseThrow(() -> {
                     log.warn(
                             "Car not found for update",
+                            kv("service_name", "CarService"),
                             kv("carId", id)
                     );
                     return new EntityNotFoundException("no such car id: " + id);
@@ -222,6 +227,7 @@ public class CarServiceImpl implements CarService {
         } catch (DomainValidationException exception) {
             log.warn(
                     "Car update configuration validation failed",
+                    kv("service_name", "CarService"),
                     kv("carId", id),
                     kv("model", complictation.model()),
                     kv("errorType", exception.getClass().getSimpleName()),
@@ -231,6 +237,7 @@ public class CarServiceImpl implements CarService {
         } catch (RuntimeException exception) {
             log.error(
                     "Failed to build updated car",
+                    kv("service_name", "CarService"),
                     kv("carId", id),
                     kv("model", complictation.model()),
                     kv("errorType", exception.getClass().getSimpleName()),
@@ -244,6 +251,7 @@ public class CarServiceImpl implements CarService {
         } catch (RuntimeException exception) {
             log.error(
                     "Failed to save updated car",
+                    kv("service_name", "CarService"),
                     kv("carId", id),
                     kv("errorType", exception.getClass().getSimpleName()),
                     exception
@@ -253,6 +261,7 @@ public class CarServiceImpl implements CarService {
 
         log.info(
                 "Car updated successfully",
+                kv("service_name", "CarService"),
                 kv("carId", id),
                 kv("brand", updated.getBrand()),
                 kv("model", updated.getModel())
@@ -266,6 +275,7 @@ public class CarServiceImpl implements CarService {
         } catch (RuntimeException exception) {
             log.error(
                     "Failed to delete car",
+                    kv("service_name", "CarService"),
                     kv("carId", id),
                     kv("errorType", exception.getClass().getSimpleName()),
                     exception
@@ -275,6 +285,7 @@ public class CarServiceImpl implements CarService {
 
         log.info(
                 "Car deleted successfully",
+                kv("service_name", "CarService"),
                 kv("carId", id)
         );
     }
@@ -286,6 +297,7 @@ public class CarServiceImpl implements CarService {
                 .orElseThrow(() -> {
                     log.warn(
                             "Car not found",
+                            kv("service_name", "CarService"),
                             kv("carId", id)
                     );
                     return new EntityNotFoundException("no such car id: " + id);
@@ -293,6 +305,7 @@ public class CarServiceImpl implements CarService {
 
         log.info(
                 "Car retrieved successfully",
+                kv("service_name", "CarService"),
                 kv("carId", id)
         );
 
@@ -325,6 +338,7 @@ public class CarServiceImpl implements CarService {
 
         log.info(
                 "Cars retrieved by criteria",
+                kv("service_name", "CarService"),
                 kv("count", result.size())
         );
 
@@ -339,6 +353,7 @@ public class CarServiceImpl implements CarService {
 
         log.info(
                 "All cars retrieved",
+                kv("service_name", "CarService"),
                 kv("count", cars.size())
         );
 

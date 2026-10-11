@@ -33,7 +33,7 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3'
     implementation 'org.springframework.boot:spring-boot-liquibase'
     implementation 'org.liquibase:liquibase-core'
-    runtimeOnly 'net.logstash.logback:logstash-logback-encoder:8.1'
+    implementation 'net.logstash.logback:logstash-logback-encoder:8.1'
     runtimeOnly 'org.postgresql:postgresql'
 
     compileOnly 'org.projectlombok:lombok:1.18.42'

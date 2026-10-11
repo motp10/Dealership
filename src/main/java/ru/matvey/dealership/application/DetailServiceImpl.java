@@ -39,6 +39,7 @@ public class DetailServiceImpl implements DetailService {
         } catch (RuntimeException exception) {
             log.warn(
                     "Failed to construct detail",
+                    kv("service_name", "DetailService"),
                     kv("detailType", request.detailType()),
                     kv("errorType", exception.getClass().getSimpleName()),
                     exception
@@ -51,6 +52,7 @@ public class DetailServiceImpl implements DetailService {
         } catch (RuntimeException exception) {
             log.error(
                     "Failed to persist detail",
+                    kv("service_name", "DetailService"),
                     kv("detailType", request.detailType()),
                     kv("errorType", exception.getClass().getSimpleName()),
                     exception
@@ -60,6 +62,7 @@ public class DetailServiceImpl implements DetailService {
 
         log.info(
                 "Detail created successfully",
+            kv("service_name", "DetailService"),
                 kv("detailId", detail.getId()),
                 kv("detailType", request.detailType())
         );
@@ -81,6 +84,7 @@ public class DetailServiceImpl implements DetailService {
         } catch (RuntimeException exception) {
             log.warn(
                     "Failed to construct replacement detail",
+                    kv("service_name", "DetailService"),
                     kv("detailId", id),
                     kv("detailType", updatedDetail.detailType()),
                     kv("errorType", exception.getClass().getSimpleName()),
@@ -95,6 +99,7 @@ public class DetailServiceImpl implements DetailService {
         } catch (RuntimeException exception) {
             log.error(
                     "Failed to replace detail",
+                    kv("service_name", "DetailService"),
                     kv("detailId", id),
                     kv("replacementDetailId", replacement.getId()),
                     kv("errorType", exception.getClass().getSimpleName()),
@@ -105,6 +110,7 @@ public class DetailServiceImpl implements DetailService {
 
         log.info(
                 "Detail replaced successfully",
+            kv("service_name", "DetailService"),
                 kv("previousDetailId", id),
                 kv("replacementDetailId", replacement.getId()),
                 kv("detailType", updatedDetail.detailType())
@@ -118,6 +124,7 @@ public class DetailServiceImpl implements DetailService {
         } catch (RuntimeException exception) {
             log.error(
                     "Failed to delete detail",
+                    kv("service_name", "DetailService"),
                     kv("detailId", id),
                     kv("errorType", exception.getClass().getSimpleName()),
                     exception
@@ -137,6 +144,7 @@ public class DetailServiceImpl implements DetailService {
                 .orElseThrow(() -> {
                     log.warn(
                             "Detail not found",
+                            kv("service_name", "DetailService"),
                             kv("detailId", id)
                     );
                     return new EntityNotFoundException(
@@ -148,6 +156,7 @@ public class DetailServiceImpl implements DetailService {
 
         log.info(
                 "Detail retrieved successfully",
+            kv("service_name", "DetailService"),
                 kv("detailId", id)
         );
 
@@ -163,6 +172,7 @@ public class DetailServiceImpl implements DetailService {
 
         log.info(
                 "Retrieved all details",
+            kv("service_name", "DetailService"),
                 kv("count", details.size())
         );
 
