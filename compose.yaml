@@ -3,10 +3,10 @@ x-app: &app
   environment:
     DB_URL: ${DB_URL:-jdbc:postgresql://db:5432/dealership_db}
     DB_USER: ${DB_USER:-postgres}
-    DB_PASSWORD: ${DB_PASSWORD:-password123}
+    DB_PASSWORD: ${DB_PASSWORD:-change-me}
     SWAGGER_ENABLED: ${SWAGGER_ENABLED:-false}
     DB_CONTEXTS: ${DB_CONTEXTS:-}
-    LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    LOG_LEVEL: ${LOG_LEVEL:-TRACE}
     PORT: ${BACKEND_PORT:-8080}
   stop_grace_period: 30s
 
@@ -16,7 +16,7 @@ services:
     environment:
       POSTGRES_DB: ${DB_NAME:-dealership_db}
       POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-password123}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-change-me}
     ports:
       - "127.0.0.1:${DB_PORT:-5432}:5432"
     volumes:

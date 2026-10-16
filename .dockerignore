@@ -4,6 +4,9 @@
 .vscode/
 .gradle/
 build/
+!build/libs/
+build/libs/*
+!build/libs/dealership.jar
 frontend/
 docs/
 .env

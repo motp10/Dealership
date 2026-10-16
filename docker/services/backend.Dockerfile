@@ -1,21 +1,16 @@
-FROM gradle:8.10.2-jdk21 AS build
-WORKDIR /workspace
+# syntax=docker/dockerfile:1
+FROM gradle:8.14.0-jdk21 AS build
+WORKDIR /home/gradle/project
 
-COPY ./gradlew ./
-COPY ./gradle ./gradle
-COPY ./build.gradle ./
-COPY ./settings.gradle ./
-COPY ./gradle.properties ./
-COPY ./src ./src
-
-RUN chmod +x ./gradlew && ./gradlew --no-daemon clean bootJar
+COPY --chown=gradle:gradle . .
+RUN gradle --no-daemon clean bootJar
 
 FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 
 RUN groupadd --system spring && useradd --system --gid spring --create-home spring
 
-COPY --from=build /workspace/build/libs/dealership.jar /app/dealership.jar
+COPY --from=build /home/gradle/project/build/libs/dealership.jar /app/dealership.jar
 
 USER spring:spring
 EXPOSE 8080

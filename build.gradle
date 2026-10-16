@@ -107,17 +107,21 @@ tasks.withType(AbstractArchiveTask).configureEach {
     reproducibleFileOrder = true
 }
 
+def composeEnvFile = file('.env').exists() ? '.env' : '.env.example'
+def composeProperties = new Properties()
+file(composeEnvFile).withInputStream { composeProperties.load(it) }
+def appImage = providers.environmentVariable('APP_IMAGE')
+    .getOrElse(composeProperties.getProperty('APP_IMAGE', 'dealership:local'))
+
 tasks.register('dockerBuild', Exec) {
     group = 'docker'
     description = 'Builds the application JAR and Docker image.'
     dependsOn 'bootJar'
     commandLine 'docker', 'build',
             '-f', 'docker/services/backend.Dockerfile',
-            '-t', System.getenv('APP_IMAGE'),
+            '-t', appImage,
             '.'
 }
-
-def composeEnvFile = file('.env').exists() ? '.env' : '.env.example'
 
 tasks.register('dockerUp', Exec) {
     group = 'docker'

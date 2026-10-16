@@ -13,16 +13,25 @@
             source="spring.profiles.active"
             defaultValue="local"/>
 
+    <springProperty
+            scope="context"
+            name="rootLogLevel"
+            source="logging.level.root"
+            defaultValue="TRACE"/>
+
     <appender name="JSON_CONSOLE"
               class="ch.qos.logback.core.ConsoleAppender">
 
+        <target>System.out</target>
+
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <customFields>{"service":"${serviceName}","environment":"${environment}"}</customFields>
+            <includeContext>false</includeContext>
         </encoder>
 
     </appender>
 
-    <root level="INFO">
+    <root level="${rootLogLevel}">
         <appender-ref ref="JSON_CONSOLE"/>
     </root>
 
