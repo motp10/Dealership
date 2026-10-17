@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: vector
+data:
+  alertmanager.yml: |
+    global:
+      resolve_timeout: 5m
+      smtp_smarthost: smtp.mail.ru:587
+      smtp_from: akki.nomer3@mail.ru
+      smtp_auth_username: akki.nomer3@mail.ru
+      smtp_auth_password_file: /etc/alertmanager/secrets/smtp-password
+    route:
+      receiver: email
+    receivers:
+      - name: email
+        email_configs:
+          - to: akki.nomer3@mail.ru
+            send_resolved: true

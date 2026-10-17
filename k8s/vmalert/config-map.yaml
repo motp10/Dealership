@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vmalert-rules
+  namespace: vector
+data:
+  alerts.yaml: |
+    groups:
+      - name: application-logs
+        type: vlogs
+        interval: 1m
+        rules:
+          - alert: TooManyApplicationErrors
+            expr: '_time:5m app_level:error | stats count() as errors | filter errors:>10'
+            for: 2m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Слишком много ошибок приложения"
+              description: "За последние 5 минут найдено более 10 записей error."
