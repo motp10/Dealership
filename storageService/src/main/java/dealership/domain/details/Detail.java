@@ -79,10 +79,6 @@ public abstract class Detail {
         return cost;
     }
 
-    public boolean isCompatibleWith(String model) {
-        return compatibleModels.contains(model);
-    }
-
     public Set<String> CompatibleModels() {
         return new HashSet<>(compatibleModels);
     }

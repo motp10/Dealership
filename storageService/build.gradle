@@ -58,8 +58,6 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-    id 'org.graalvm.buildtools.native' version '0.10.1'
 }
 
 tasks.withType(JavaCompile).configureEach {

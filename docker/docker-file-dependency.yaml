@@ -158,6 +158,30 @@ services:
     networks:
       - dealership-network
 
+  frontend:
+    build:
+      context: ..
+      dockerfile: frontend/Dockerfile
+    container_name: dealership-frontend
+    ports:
+      - "8083:80"
+    depends_on:
+      - order-service
+    networks:
+      - dealership-network
+
+  storage-frontend:
+    build:
+      context: ..
+      dockerfile: storageFrontend/Dockerfile
+    container_name: dealership-storage-frontend
+    ports:
+      - "8084:80"
+    depends_on:
+      - storage-service
+    networks:
+      - dealership-network
+
 networks:
   dealership-network:
     driver: bridge

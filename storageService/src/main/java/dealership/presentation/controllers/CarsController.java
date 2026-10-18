@@ -61,7 +61,7 @@ public class CarsController {
             return carService.getAllCars();
         }
         CarComplictation complictation = new CarComplictation(
-                0,
+                request.maxPrice(),
                 request.brand(),
                 request.model(),
                 request.bodyType(),

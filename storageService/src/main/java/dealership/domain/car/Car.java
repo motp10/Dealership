@@ -1,6 +1,5 @@
 package dealership.domain.car;
 
-import dealership.exceptions.DomainValidationException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import dealership.domain.details.Body.Body;
@@ -72,27 +71,6 @@ public class Car {
         DriveLayout drivelayout,
         Cost defaultCost
     ) {
-        if (!body.isCompatibleWith(model)) throw new DomainValidationException(
-            "body is not compatible with model"
-        );
-        if (
-            !carPaint.isCompatibleWith(model)
-        ) throw new DomainValidationException(
-            "color is not compatible with model"
-        );
-        if (!fuel.isCompatibleWith(model)) throw new DomainValidationException(
-            "fuel is not compatible with model"
-        );
-        if (
-            !transmission.isCompatibleWith(model)
-        ) throw new DomainValidationException(
-            "transmission is not compatible with model"
-        );
-        if (
-            !drivelayout.isCompatibleWith(model)
-        ) throw new DomainValidationException(
-            "drivelayout is not compatible with model"
-        );
         this.id = UUID.randomUUID();
         this.brand = brand;
         this.model = model;
@@ -115,27 +93,6 @@ public class Car {
         DriveLayout drivelayout,
         Cost defaultCost
     ) {
-        if (!body.isCompatibleWith(model)) throw new DomainValidationException(
-            "body is not compatible with model"
-        );
-        if (
-            !carPaint.isCompatibleWith(model)
-        ) throw new DomainValidationException(
-            "color is not compatible with model"
-        );
-        if (!fuel.isCompatibleWith(model)) throw new DomainValidationException(
-            "fuel is not compatible with model"
-        );
-        if (
-            !transmission.isCompatibleWith(model)
-        ) throw new DomainValidationException(
-            "transmission is not compatible with model"
-        );
-        if (
-            !drivelayout.isCompatibleWith(model)
-        ) throw new DomainValidationException(
-            "drivelayout is not compatible with model"
-        );
         this.id = id;
         this.brand = brand;
         this.model = model;

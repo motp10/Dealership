@@ -6,6 +6,8 @@ import dealership.domain.details.Interior.Interior;
 import dealership.domain.details.Interior.InteriorInfo;
 import dealership.domain.details.SteeringWheel.SteeringWheel;
 import dealership.domain.details.SteeringWheel.SteeringWheelInfo;
+import dealership.domain.details.Spoiler.Spoiler;
+import dealership.domain.details.Spoiler.SpoilerInfo;
 import dealership.domain.details.Transmission.Transmission;
 import dealership.domain.details.Transmission.TransmissionInfo;
 import dealership.domain.details.Wheel.Wheel;
@@ -30,6 +32,7 @@ public class DetailsFactory {
             case "interior" -> new Interior(new InteriorInfo(info), new Cost(price), compatitiveAuto);
             case "Steering wheel" -> new SteeringWheel(new SteeringWheelInfo(info), new Cost(price), compatitiveAuto);
             case "wheel" -> new Wheel(new WheelInfo(info), new Cost(price), compatitiveAuto);
+            case "spoiler" -> new Spoiler(new SpoilerInfo(info), new Cost(price), compatitiveAuto);
             default -> throw new IllegalArgumentException("Unknown detail type: " + type);
         };
     }

@@ -41,7 +41,7 @@ public class DetailController {
         detailService.deleteDetail(id);
     }
     @GetMapping("/{id}")
-    public DetailDto getDetail(@RequestBody UUID id) {
+    public DetailDto getDetail(@PathVariable UUID id) {
         return detailService.getDetail(id);
     }
     @GetMapping

@@ -1,7 +1,5 @@
-FROM gradle:8-jdk21-alpine AS builder
+FROM gradle:8-jdk21 AS builder
 WORKDIR /app
-
-RUN apk add --no-cache libc6-compat
 
 COPY settings.gradle build.gradle ./
 COPY commonLib ./commonLib

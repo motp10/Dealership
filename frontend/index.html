@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f3f4ef" />
+    <title>Автосалон | Каталог</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Автосалон, главная">
+        <span class="brand-mark" aria-hidden="true">A</span>
+        <span>АВТОСАЛОН<span class="brand-period">.</span></span>
+      </a>
+      <div class="topbar-meta"><span class="status-dot"></span> Каталог автомобилей</div>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="pageTitle">
+        <div class="intro-copy">
+          <p class="eyebrow">ВЫБРАННЫЕ АВТОМОБИЛИ</p>
+          <h1 id="pageTitle">Найдите свой<br /><span>следующий маршрут.</span></h1>
+          <p class="intro-note">Автомобили в наличии, собранные в одном месте.</p>
+        </div>
+        <div class="intro-index" aria-hidden="true"><span>01</span><i></i><span>КАТАЛОГ</span></div>
+      </section>
+
+      <section class="catalog" aria-label="Каталог автомобилей">
+        <div class="catalog-toolbar">
+          <div class="catalog-count"><span id="carCount">—</span><span class="count-label">автомобилей</span></div>
+          <label class="search-box">
+            <span class="visually-hidden">Поиск по марке или модели</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m16 16 4 4"></path></svg>
+            <input id="searchInput" type="search" placeholder="Марка или модель" autocomplete="off" />
+          </label>
+          <button class="refresh-button" id="refreshButton" type="button" aria-label="Обновить каталог" title="Обновить каталог">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"></path><path d="M5.6 9a7 7 0 0 1 11.6-2L20 12M4 12l2.8 5a7 7 0 0 0 11.6-2"></path></svg>
+          </button>
+        </div>
+
+        <div id="message" class="message" role="status" aria-live="polite">Загружаем автомобили…</div>
+        <div id="carGrid" class="car-grid" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <footer><span>АВТОСАЛОН<span class="brand-period">.</span></span><span>Каталог обновляется из системы заказов</span></footer>
+  </body>
+</html>

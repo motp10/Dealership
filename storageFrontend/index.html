@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#e9eeeb" />
+    <title>Автосалон | Склад</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Склад автомобилей">
+        <span class="brand-mark" aria-hidden="true">S</span>
+        <span>АВТОСАЛОН<span class="brand-period">.</span> / СКЛАД</span>
+      </a>
+      <a class="store-link" href="http://localhost:8083">К витрине <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <main>
+      <section class="masthead">
+        <div>
+          <p class="eyebrow">УПРАВЛЕНИЕ ИНВЕНТАРЁМ <span>·</span> STORAGE SERVICE</p>
+          <h1>Склад<span>.</span></h1>
+          <p class="lead">Комплектации и автомобили в едином реестре.</p>
+        </div>
+        <div class="masthead-stamp"><span>WAREHOUSE</span><strong>02</strong><i>LIVE REGISTRY</i></div>
+      </section>
+
+      <nav class="view-tabs" aria-label="Раздел склада">
+        <button class="view-tab is-active" type="button" data-view="carsView" aria-pressed="true">Автомобили</button>
+        <button class="view-tab" type="button" data-view="detailsView" aria-pressed="false">Детали</button>
+      </nav>
+
+      <section id="carsView" class="inventory" aria-label="Склад автомобилей">
+        <div class="inventory-head">
+          <div class="inventory-title"><span class="section-number">01</span><div><p class="eyebrow">РЕЕСТР</p><h2>Автомобили</h2></div></div>
+          <button id="addButton" class="button button-accent" type="button" disabled><span aria-hidden="true">+</span> Добавить автомобиль</button>
+        </div>
+        <div class="toolbar">
+          <div class="record-count"><strong id="carCount">—</strong><span>записей</span></div>
+          <label class="search-box">
+            <span class="visually-hidden">Поиск автомобиля</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m16 16 4 4"></path></svg>
+            <input id="searchInput" type="search" placeholder="Поиск по марке, модели или ID" autocomplete="off" />
+          </label>
+          <button id="refreshButton" class="icon-button" type="button" aria-label="Обновить склад" title="Обновить склад">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"></path><path d="M5.6 9a7 7 0 0 1 11.6-2L20 12M4 12l2.8 5a7 7 0 0 0 11.6-2"></path></svg>
+          </button>
+        </div>
+        <form id="carSearchForm" class="filter-panel">
+          <label>Марка<input name="brand" placeholder="Любая марка" /></label>
+          <label>Модель<input name="model" placeholder="Любая модель" /></label>
+          <label>Кузов<select name="bodyType"><option value="">Любой</option></select></label>
+          <label>Топливо<select name="fuel"><option value="">Любое</option></select></label>
+          <label>КПП<select name="transmission"><option value="">Любая</option></select></label>
+          <label>Привод<select name="driveLayout"><option value="">Любой</option></select></label>
+          <label>Цвет<select name="paint"><option value="">Любой</option></select></label>
+          <label>Колёса<input name="wheel" placeholder="Любые" /></label>
+          <label>Цена до, ₽<input name="maxPrice" type="number" min="1" step="1" placeholder="Без ограничения" /></label>
+          <div class="filter-actions"><button class="button button-dark" type="submit">Найти</button><button id="clearFilters" class="button button-light" type="button">Сбросить</button></div>
+        </form>
+        <div id="message" class="message" role="status" aria-live="polite">Загружаем склад…</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Автомобиль</th><th>Кузов / привод</th><th>Топливо / КПП</th><th>Цвет</th><th>Стоимость</th><th><span class="visually-hidden">Действия</span></th></tr></thead>
+            <tbody id="carRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="detailsView" class="inventory" aria-label="Справочник деталей" hidden>
+        <div class="inventory-head">
+          <div class="inventory-title"><span class="section-number">02</span><div><p class="eyebrow">СПРАВОЧНИК</p><h2>Детали и комплектации</h2></div></div>
+          <button id="addDetailButton" class="button button-accent" type="button"><span aria-hidden="true">+</span> Добавить деталь</button>
+        </div>
+        <div class="toolbar">
+          <div class="record-count"><strong id="detailCount">—</strong><span>записей</span></div>
+          <label class="search-box"><span class="visually-hidden">Поиск детали</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m16 16 4 4"></path></svg><input id="detailSearchInput" type="search" placeholder="Поиск по типу, значению или ID" autocomplete="off" /></label>
+          <button id="refreshDetailsButton" class="icon-button" type="button" aria-label="Обновить детали" title="Обновить детали"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"></path><path d="M5.6 9a7 7 0 0 1 11.6-2L20 12M4 12l2.8 5a7 7 0 0 0 11.6-2"></path></svg></button>
+        </div>
+        <div id="detailsMessage" class="message" role="status" aria-live="polite"></div>
+        <div class="table-wrap"><table><thead><tr><th>Тип</th><th>Значение</th><th>Совместимость</th><th>Стоимость</th><th><span class="visually-hidden">Действия</span></th></tr></thead><tbody id="detailRows"></tbody></table></div>
+      </section>
+    </main>
+
+    <footer><span>STORAGE SERVICE <i>·</i> 02</span><span>Автосалон / внутренний реестр</span></footer>
+
+    <dialog id="carDialog" class="editor-dialog">
+      <form id="carForm" method="dialog">
+        <div class="dialog-head"><div><p class="eyebrow">КАРТОЧКА СКЛАДА</p><h2 id="dialogTitle">Новый автомобиль</h2></div><button id="closeDialog" class="icon-button close-button" type="button" aria-label="Закрыть">×</button></div>
+        <input id="carId" type="hidden" />
+        <div class="form-grid">
+          <label>Марка<input name="brand" required maxlength="80" /></label>
+          <label>Модель<input name="model" required maxlength="80" /></label>
+          <label>Кузов<select name="bodyType" required></select></label>
+          <label>Топливо<select name="fuel" required></select></label>
+          <label>Коробка передач<select name="transmission" required></select></label>
+          <label>Привод<select name="driveLayout" required></select></label>
+          <label>Цвет<select name="paint" required></select></label>
+          <label>Колёса<input name="wheel" placeholder="Например: 19 дюймов" /></label>
+        </div>
+        <div id="formMessage" class="form-message" role="status" aria-live="polite"></div>
+        <div class="dialog-actions"><button id="cancelButton" class="button button-light" type="button">Отмена</button><button id="saveButton" class="button button-dark" type="submit">Сохранить</button></div>
+      </form>
+    </dialog>
+
+    <dialog id="detailDialog" class="editor-dialog">
+      <form id="detailForm" method="dialog">
+        <div class="dialog-head"><div><p class="eyebrow">КАРТОЧКА ДЕТАЛИ</p><h2 id="detailDialogTitle">Новая деталь</h2></div><button id="closeDetailDialog" class="icon-button close-button" type="button" aria-label="Закрыть">×</button></div>
+        <input name="id" type="hidden" />
+        <div class="form-grid">
+          <label>Тип<select name="type" required>
+            <option value="">Выберите тип</option><option value="body">Кузов</option><option value="fuel">Топливо</option><option value="transmission">Коробка передач</option><option value="drivelayout">Привод</option><option value="paint">Цвет</option><option value="wheel">Колёса</option><option value="interior">Салон</option><option value="spoiler">Спойлер</option><option value="Steering wheel">Рулевое колесо</option>
+          </select></label>
+          <label>Значение<input name="information" required maxlength="120" /></label>
+          <label>Стоимость, ₽<input name="cost" type="number" min="0" step="0.01" required /></label>
+          <label class="span-two">Совместимые модели<input name="compatibleModels" placeholder="Например: Model S, Model X" /><span class="field-hint">Разделяйте модели запятыми</span></label>
+        </div>
+        <div id="detailFormMessage" class="form-message" role="status" aria-live="polite"></div>
+        <div class="dialog-actions"><button id="cancelDetailButton" class="button button-light" type="button">Отмена</button><button id="saveDetailButton" class="button button-dark" type="submit">Сохранить</button></div>
+      </form>
+    </dialog>
+
+    <dialog id="recordDialog" class="editor-dialog record-dialog">
+      <div class="record-dialog-content"><div class="dialog-head"><div><p id="recordEyebrow" class="eyebrow">КАРТОЧКА</p><h2 id="recordTitle">Запись</h2></div><button id="closeRecordDialog" class="icon-button close-button" type="button" aria-label="Закрыть">×</button></div><dl id="recordFields" class="record-fields"></dl></div>
+    </dialog>
+  </body>
+</html>

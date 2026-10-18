@@ -137,7 +137,7 @@ public class CarServiceImpl implements CarService {
     @PreAuthorize("hasAnyRole('WAREHOUSEADMIN', 'ADMIN')")
     public List<CarDto> getCars(CarComplictation filter) {
         List<Car> cars = carsRepository.findByCriteria(
-                new Cost(filter.maxPrice()),
+                filter.maxPrice() > 0 ? new Cost(filter.maxPrice()) : null,
                 filter.brand().isEmpty() ? null : filter.brand(),
                 filter.model().isEmpty() ? null : filter.model(),
                 filter.bodyType().isEmpty() ? null : new BodyInfo(filter.bodyType()),

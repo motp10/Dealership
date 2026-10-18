@@ -13,5 +13,6 @@ public record CarConfigurationRequest(
         String transmission,
         String driveLayout,
         String wheel,
-        UUID carID
+        UUID carID,
+        double maxPrice
 ) {}
