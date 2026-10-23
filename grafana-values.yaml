@@ -1,0 +1,15 @@
+adminPassword: admin
+adminUser: admin
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    - access: proxy
+      isDefault: true
+      name: VictoriaLogs
+      type: victoriametrics-logs-datasource
+      url: http://vls-victoria-logs-single-server.logging.svc.cluster.local:9428
+plugins:
+- victoriametrics-logs-datasource
+service:
+  type: ClusterIP

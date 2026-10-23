@@ -48,6 +48,8 @@ dependencies {
     testImplementation 'org.testcontainers:postgresql:1.19.7'
     testCompileOnly 'org.projectlombok:lombok:1.18.42'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.42'
+
+    implementation 'io.micrometer:micrometer-registry-prometheus'
 }
 
 tasks.register('startDatabase', Exec) {

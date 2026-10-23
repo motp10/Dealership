@@ -1,0 +1,43 @@
+customConfig:
+  data_dir: /vector-data-dir
+  sinks:
+    victorialogs:
+      api_version: v8
+      compression: gzip
+      endpoints:
+      - http://vls-victoria-logs-single-server.logging.svc.cluster.local:9428/insert/elasticsearch/
+      healthcheck:
+        enabled: false
+      inputs:
+      - exclude_debug
+      mode: bulk
+      query:
+        _msg_field: message
+        _stream_fields: kubernetes.pod_namespace,kubernetes.pod_name,kubernetes.container_name
+        _time_field: timestamp
+      type: elasticsearch
+  sources:
+    kubernetes:
+      type: kubernetes_logs
+  transforms:
+    exclude_debug:
+      condition:
+        source: .level != "debug"
+        type: vrl
+      inputs:
+      - parse_level
+      type: filter
+    parse_level:
+      inputs:
+      - kubernetes
+      source: |
+        parsed, err = parse_json(.message)
+        if err == null && is_object(parsed) {
+          . = merge!(., parsed)
+        }
+      type: remap
+role: Agent
+service:
+  enabled: false
+serviceHeadless:
+  enabled: false

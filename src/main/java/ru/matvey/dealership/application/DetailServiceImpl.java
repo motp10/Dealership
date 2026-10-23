@@ -54,7 +54,7 @@ public class DetailServiceImpl implements DetailService {
                     "Failed to persist detail",
                     kv("service_name", "DetailService"),
                     kv("detailType", request.detailType()),
-                    kv("errorType", exception.getClass().getSimpleName()),у
+                    kv("errorType", exception.getClass().getSimpleName()),
                     exception
             );
             throw exception;
