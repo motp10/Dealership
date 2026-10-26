@@ -18,7 +18,7 @@ spec:
           image: victoriametrics/vmalert:latest
           args:
             - -rule=/etc/vmalert/alerts.yaml
-            - -datasource.url=http://vls-victoria-logs-single-server:9428
+            - -datasource.url=http://vls-victoria-logs-single-server.logging.svc.cluster.local:9428
             - -notifier.url=http://alertmanager:9093
             - -rule.defaultRuleType=vlogs
             - -httpListenAddr=:8880

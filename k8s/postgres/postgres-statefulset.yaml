@@ -43,11 +43,23 @@ spec:
             failureThreshold: 10
 
         - name: postgres-exporter
-          image: quay.io/prometheuscommunity/postgres-exporter
-
-          volumeMounts:
-              - name: postgres-data
-                mountPath: /var/lib/postgresql/data
+          image: quay.io/prometheuscommunity/postgres-exporter:v0.17.1
+          ports:
+            - name: metrics
+              containerPort: 9187
+          env:
+            - name: DATA_SOURCE_URI
+              value: postgres:5432/dealership_db?sslmode=disable
+            - name: DATA_SOURCE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_USER
+            - name: DATA_SOURCE_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
 
   volumeClaimTemplates:
     - metadata:

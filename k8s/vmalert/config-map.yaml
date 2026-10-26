@@ -11,7 +11,7 @@ data:
         interval: 1m
         rules:
           - alert: TooManyApplicationErrors
-            expr: '_time:5m app_level:error | stats count() as errors | filter errors:>10'
+            expr: '_time:5m level:error | stats count() as errors | filter errors:>10'
             for: 2m
             labels:
               severity: warning

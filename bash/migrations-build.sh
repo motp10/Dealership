@@ -2,7 +2,7 @@
 
 set -e
 
-IMAGE_NAME="dealership-migrations:local"
+IMAGE_NAME="dealership-migrations:local-v2"
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 docker build \
@@ -12,5 +12,6 @@ docker build \
 
 minikube image load "$IMAGE_NAME"
 
-kubectl rollout restart deployment/migrations
-kubectl rollout status deployment/migrations
+kubectl delete job migrations --ignore-not-found
+kubectl apply -f "$PROJECT_ROOT/k8s/migrations/job.yaml"
+kubectl wait --for=condition=complete job/migrations --timeout=180s

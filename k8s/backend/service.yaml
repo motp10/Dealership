@@ -4,6 +4,10 @@ metadata:
   name: backend
   labels:
     app: backend
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8091"
+    prometheus.io/path: "/actuator/prometheus"
 spec:
   selector:
     app: backend

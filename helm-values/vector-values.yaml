@@ -1,0 +1,67 @@
+customConfig:
+  data_dir: /vector-data-dir
+  sinks:
+    victorialogs:
+      api_version: v8
+      compression: gzip
+      endpoints:
+      - http://vls-victoria-logs-single-server.logging.svc.cluster.local:9428/insert/elasticsearch/
+      healthcheck:
+        enabled: false
+      inputs:
+      - exclude_debug
+      mode: bulk
+      query:
+        _msg_field: message
+        _stream_fields: kubernetes.pod_namespace,kubernetes.pod_name,kubernetes.container_name
+        _time_field: timestamp
+      type: elasticsearch
+  sources:
+    kubernetes:
+      type: kubernetes_logs
+  transforms:
+    exclude_debug:
+      condition:
+        source: .level != "debug"
+        type: vrl
+      inputs:
+      - parse_level
+      type: filter
+    parse_level:
+      inputs:
+      - kubernetes
+      source: |
+        .level = "unknown"
+
+        parsed, err = parse_json(.message)
+        if err == null && is_object(parsed) && exists(parsed.level) {
+          .level = downcase(to_string!(parsed.level))
+        } else {
+          parsed_logfmt, err_logfmt = parse_logfmt(.message)
+          if err_logfmt == null && is_object(parsed_logfmt) && exists(parsed_logfmt.level) {
+            .level = downcase(to_string!(parsed_logfmt.level))
+          } else {
+            klog_parsed = parse_klog(.message) ?? {}
+            if is_object(klog_parsed) && exists(klog_parsed.level) {
+              .level = downcase(to_string!(klog_parsed.level))
+            } else {
+              bracket_level = parse_regex(
+                .message,
+                r'^\[(?P<level>TRACE|DEBUG|INFO|WARN|WARNING|ERROR|FATAL)\]'
+              ) ?? {}
+              if is_object(bracket_level) && exists(bracket_level.level) {
+                .level = downcase(to_string!(bracket_level.level))
+              }
+            }
+          }
+        }
+
+        if .level == "warning" {
+          .level = "warn"
+        }
+      type: remap
+role: Agent
+service:
+  enabled: false
+serviceHeadless:
+  enabled: false

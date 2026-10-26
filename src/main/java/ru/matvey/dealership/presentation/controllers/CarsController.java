@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import lombok.RequiredArgsConstructor;
 import jakarta.validation.Valid;
+import io.micrometer.core.instrument.MeterRegistry;
+import jakarta.annotation.PostConstruct;
 import org.springframework.web.bind.annotation.*;
 import ru.matvey.dealership.contracts.models.CarDto;
 import ru.matvey.dealership.contracts.operations.CarComplictation;
@@ -21,6 +23,13 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 @RequiredArgsConstructor
 public class CarsController {
     private final CarService adminService;
+    private final MeterRegistry meterRegistry;
+
+    @PostConstruct
+    void registerBusinessMetrics() {
+        meterRegistry.counter("dealership_cars_created_total");
+        meterRegistry.counter("dealership_cars_deleted_total");
+    }
 
     @PostMapping
     public UUID addCar(@Valid @RequestBody CarConfigurationRequest request) {
@@ -35,6 +44,7 @@ public class CarsController {
                 request.paint(),
                 request.wheel());
         UUID carId = adminService.addCar(complictation);
+        meterRegistry.counter("dealership_cars_created_total").increment();
         log.info("Car creation request completed",
             kv("component", "presentation-controller"),
             kv("controller_name", "CarsController"),
@@ -67,6 +77,7 @@ public class CarsController {
     @DeleteMapping
     public void deleteCar(@PathVariable UUID id) {
         adminService.deleteCar(id);
+        meterRegistry.counter("dealership_cars_deleted_total").increment();
         log.info("Car deletion request completed",
             kv("component", "presentation-controller"),
             kv("controller_name", "CarsController"),

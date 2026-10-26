@@ -3,6 +3,8 @@ package ru.matvey.dealership.presentation.controllers;
 import lombok.extern.slf4j.Slf4j;
 
 import lombok.RequiredArgsConstructor;
+import io.micrometer.core.instrument.MeterRegistry;
+import jakarta.annotation.PostConstruct;
 import org.springframework.web.bind.annotation.*;
 import ru.matvey.dealership.contracts.models.ConfigurationOrderDto;
 import ru.matvey.dealership.contracts.operations.CarComplictation;
@@ -21,6 +23,12 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 @RequiredArgsConstructor
 public class ConfigurationCarOrderController {
     private final OrderService orderService;
+    private final MeterRegistry meterRegistry;
+
+    @PostConstruct
+    void registerBusinessMetrics() {
+        meterRegistry.counter("dealership_configuration_orders_created_total");
+    }
     @PostMapping
     public UUID makeOrder(@RequestBody CarConfigurationRequest request) {
         CarComplictation complictation = new CarComplictation(0,
@@ -33,6 +41,7 @@ public class ConfigurationCarOrderController {
                 request.paint(),
                 request.wheel());
         UUID orderId = orderService.makeOrderWithConfiguration(complictation, request.clientId());
+        meterRegistry.counter("dealership_configuration_orders_created_total").increment();
         log.info("Configuration order request completed",
             kv("component", "presentation-controller"),
             kv("controller_name", "ConfigurationCarOrderController"),

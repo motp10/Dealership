@@ -14,7 +14,6 @@ spec:
       labels:
         app: backend
 
-
     spec:
       containers:
         - name: backend
@@ -22,6 +21,8 @@ spec:
 
           ports:
             - containerPort: 8080
+            - name: management
+              containerPort: 8091
 
           envFrom:  
             - configMapRef:
