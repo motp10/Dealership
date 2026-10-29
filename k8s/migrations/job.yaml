@@ -27,12 +27,28 @@ spec:
                   name: postgres-config
                   key: DB_PORT
 
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: POSTGRES_DB
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
           command:
             - sh
             - -c
             - |
-              until pg_isready -h "$DB_HOST" -p "$DB_PORT"; do
-                echo "Waiting for PostgreSQL..."
+              until PGPASSWORD="$POSTGRES_PASSWORD" \
+                psql -h "$DB_HOST" \
+                    -p "$DB_PORT" \
+                    -U postgres \
+                    -d "$POSTGRES_DB" \
+                    -c "SELECT 1" >/dev/null 2>&1; do
+                echo "Waiting for database '$POSTGRES_DB' to become available..."
                 sleep 2
               done
 

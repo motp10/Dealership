@@ -27,6 +27,16 @@ customConfig:
       inputs:
       - parse_level
       type: filter
+
+    drop_kube_probe:
+      type: filter
+      inputs:
+        - parse_level
+      condition:
+        type: vrl
+        source: |
+          !contains(to_string(.message) ?? "", "kube-probe/")
+
     parse_level:
       inputs:
       - kubernetes
@@ -43,14 +53,14 @@ customConfig:
           } else {
             klog_parsed = parse_klog(.message) ?? {}
             if is_object(klog_parsed) && exists(klog_parsed.level) {
-              .level = downcase(to_string!(klog_parsed.level))
+              .level = downcase(to_string(klog_parsed.level))
             } else {
               bracket_level = parse_regex(
                 .message,
                 r'^\[(?P<level>TRACE|DEBUG|INFO|WARN|WARNING|ERROR|FATAL)\]'
               ) ?? {}
               if is_object(bracket_level) && exists(bracket_level.level) {
-                .level = downcase(to_string!(bracket_level.level))
+                .level = downcase(to_string(bracket_level.level))
               }
             }
           }

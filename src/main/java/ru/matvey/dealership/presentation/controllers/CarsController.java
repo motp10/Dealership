@@ -95,7 +95,14 @@ public class CarsController {
         return car;
     }
     @GetMapping
-    public List<CarDto> getCars(@RequestBody CarConfigurationRequest request) {
+    public List<CarDto> getAllCars() {
+        return adminService.getAllCars();
+    }
+
+    @PostMapping("/search")
+    public List<CarDto> getCars(
+            @Valid @RequestBody CarConfigurationRequest request) {
+
         CarComplictation complictation = new CarComplictation(
                 request.baseCost() == null ? 0 : request.baseCost(),
                 request.brand(),
@@ -106,15 +113,7 @@ public class CarsController {
                 request.driveLayout(),
                 request.paint(),
                 request.wheel());
-        boolean allCars = complictation == CarComplictation.empty();
-        List<CarDto> cars = allCars
-            ? adminService.getAllCars()
-            : adminService.getCars(complictation);
-        log.debug("Car list request completed",
-            kv("component", "presentation-controller"),
-            kv("controller_name", "CarsController"),
-            kv("operation", allCars ? "getAll" : "getByCriteria"),
-            kv("count", cars.size()));
-        return cars;
+
+        return adminService.getCars(complictation);
     }
 }
