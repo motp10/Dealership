@@ -22,3 +22,21 @@ config:
         body: '{}'
         preferred_ip_protocol: ip4
         valid_status_codes: [200]
+
+    create_stock_car_order:
+      prober: http
+      timeout: 10s
+      http:
+        method: POST
+        headers:
+          Content-Type: application/json
+          Accept: application/json
+        body: |
+          {
+            "clientId": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+            "carId": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
+          }
+        preferred_ip_protocol: ip4
+        valid_status_codes: [200]
+
+

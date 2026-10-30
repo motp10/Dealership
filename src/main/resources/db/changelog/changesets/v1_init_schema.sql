@@ -65,7 +65,7 @@ CREATE TABLE stock_car_orders (
     id UUID PRIMARY KEY,
     client_id UUID REFERENCES app_users(id),
     manager_id UUID REFERENCES app_users(id),
-    car_id UUID UNIQUE REFERENCES cars(id),
+    car_id UUID REFERENCES cars(id),
     status VARCHAR(100),
     created_at TIMESTAMP,
     updated_at TIMESTAMP,

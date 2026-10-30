@@ -3,6 +3,7 @@
 --changeset matvey:seed-users
 INSERT INTO app_users (id, username, password, full_name, role, created_at, updated_at, removed) VALUES
 ('11111111-1111-1111-1111-111111111111', 'admin', 'admin123', 'Главный Администратор', 'ADMIN', NOW(), NOW(), false),
+('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'client2', 'client123', 'Обычный Клиент2', 'CLIENT', NOW(), NOW(), false),
 ('22222222-2222-2222-2222-222222222222', 'client', 'client123', 'Обычный Клиент', 'CLIENT', NOW(), NOW(), false);
 
 --changeset matvey:seed-details

@@ -48,7 +48,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public UUID makeStockCarOrder(MakeOrder.Request request) {
-        UUID managerId = userRepository.getRandomManager();
+        UUID managerId = UUID.fromString("11111111-1111-1111-1111-111111111111");
         OrderStockCar order;
 
         try {

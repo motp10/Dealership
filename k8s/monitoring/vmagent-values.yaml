@@ -34,3 +34,24 @@ config:
 
         - target_label: __address__
           replacement: blackbox-exporter-prometheus-blackbox-exporter.monitoring.svc.cluster.local:9115
+          
+    - job_name: stock-car-order-prober
+      metrics_path: /probe
+      params:
+        module: [create_stock_car_order]
+      static_configs:
+        - targets:
+            - http://backend.default.svc.cluster.local:8080/api/stockCars
+      relabel_configs:
+        - source_labels: [__address__]
+          target_label: __param_target
+        - source_labels: [__param_target]
+          target_label: instance
+        - target_label: __address__
+          replacement: blackbox-exporter-prometheus-blackbox-exporter.monitoring.svc.cluster.local:9115
+    
+    - job_name: postgres-exporter
+      metrics_path: /metrics
+      static_configs:
+        - targets:
+            - postgres.default.svc.cluster.local:9187
