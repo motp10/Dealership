@@ -45,6 +45,7 @@ customConfig:
 
         parsed, err = parse_json(.message)
         if err == null && is_object(parsed) && exists(parsed.level) {
+          . = merge!(., parsed) 
           .level = downcase(to_string!(parsed.level))
         } else {
           parsed_logfmt, err_logfmt = parse_logfmt(.message)

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: vmalert-rules
+  name: vmalert-logs-rules
   namespace: vector
 data:
   alerts.yaml: |
@@ -18,3 +18,4 @@ data:
             annotations:
               summary: "Слишком много ошибок приложения"
               description: "За последние 5 минут найдено более 10 записей error."
+              runbook_url: "{{ $externalURL }}/vmalert/alerts?alertname=TooManyApplicationErrors"

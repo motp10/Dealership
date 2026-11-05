@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vmalert-rules
+  namespace: vector
+data:
+  alerts.yaml: |
+    groups:
+      - name: service-and-actuator-alerts
+        type: prometheus
+        interval: 30s
+        rules:
+          - alert: HighHttpErrorRate
+            expr: |
+              (
+                sum(rate(http_server_requests_seconds_count{status=~"5.."}[2m]))
+                /
+                sum(rate(http_server_requests_seconds_count[2m]))
+              ) * 100 > 5
+            for: 1m
+            labels:
+              severity: critical
+              component: service
+            annotations:
+              summary: "Высокий процент 5xx ошибок ({{ $value | printf \"%.1f\" }}%)"
+              description: "Сервис {{ $labels.job }} генерирует более 5% ответов 5xx за последние 2 минуты."
+              runbook_url: "{{ $externalURL }}/vmalert/alerts?alertname=HighHttpErrorRate"
+
+          - alert: ServiceInstanceDown
+            expr: up{job=~".*your-app-job.*"} == 0
+            for: 30s
+            labels:
+              severity: critical
+              component: service
+            annotations:
+              summary: "Инстанс сервиса недоступен"
+              description: "Target {{ $labels.instance }} (job {{ $labels.job }}) не отвечает на scrape-запросы более 30 секунд."
+
+      - name: runtime-actuator-alerts
+        type: prometheus
+        interval: 30s
+        rules:
+          - alert: HighJvmHeapUsage
+            expr: |
+              (
+                sum by (instance, job) (jvm_memory_used_bytes{area="heap"})
+                /
+                sum by (instance, job) (jvm_memory_max_bytes{area="heap"})
+              ) * 100 > 85
+            for: 2m
+            labels:
+              severity: warning
+              component: runtime
+            annotations:
+              summary: "Высокая загрузка JVM Heap ({{ $value | printf \"%.1f\" }}%)"
+              description: "Heap в {{ $labels.instance }} занят более чем на 85% в течение 2 минут."
+              runbook_url: "{{ $externalURL }}/vmalert/alerts?alertname=HighJvmHeapUsage"
+
+          - alert: HighTomcatThreadUsage
+            expr: |
+              (
+                tomcat_threads_busy_threads
+                /
+                tomcat_threads_config_max_threads
+              ) * 100 > 90
+            for: 2m
+            labels:
+              severity: warning
+              component: runtime
+            annotations:
+              summary: "Пул потоков Tomcat почти исчерпан ({{ $value | printf \"%.1f\" }}%)"
+              description: "Занято более 90% потоков Tomcat в {{ $labels.instance }}."
+              runbook_url: "{{ $externalURL }}/vmalert/alerts?alertname=HighTomcatThreadUsage"

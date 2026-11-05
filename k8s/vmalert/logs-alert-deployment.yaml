@@ -1,34 +1,49 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: vmalert
+  name: vmalert-logs
   namespace: vector
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: vmalert
+      app: vmalert-logs
   template:
     metadata:
       labels:
-        app: vmalert
+        app: vmalert-logs
     spec:
       containers:
         - name: vmalert
           image: victoriametrics/vmalert:latest
           args:
             - -rule=/etc/vmalert/alerts.yaml
+
+            # VictoriaLogs
             - -datasource.url=http://vls-victoria-logs-single-server.logging.svc.cluster.local:9428
-            - -notifier.url=http://alertmanager:9093
             - -rule.defaultRuleType=vlogs
+
+            # Alertmanager
+            - -notifier.url=http://alertmanager:9093
+
+            # HTTP
             - -httpListenAddr=:8880
+
+            # Recording rules output
+            - -remoteWrite.url=http://monitoring.vmsingle-monitoring-server.svc.cluster.local:8428
+
+            # External URL
+            - -external.url=http://vmalert-logs.vector.svc:8880
+
           ports:
             - name: web
               containerPort: 8880
+
           volumeMounts:
             - name: rules
               mountPath: /etc/vmalert
+
       volumes:
         - name: rules
           configMap:
-            name: vmalert-rules
+            name: vmalert-logs-rules

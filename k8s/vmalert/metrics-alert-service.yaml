@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: vmalert
+  name: vmalert-metrics
   namespace: vector
 spec:
   selector:
-    app: vmalert
+    app: vmalert-metrics
   ports:
     - name: web
       port: 8880
