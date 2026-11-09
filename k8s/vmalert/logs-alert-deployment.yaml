@@ -19,20 +19,15 @@ spec:
           args:
             - -rule=/etc/vmalert/alerts.yaml
 
-            # VictoriaLogs
             - -datasource.url=http://vls-victoria-logs-single-server.logging.svc.cluster.local:9428
             - -rule.defaultRuleType=vlogs
 
-            # Alertmanager
             - -notifier.url=http://alertmanager:9093
 
-            # HTTP
             - -httpListenAddr=:8880
 
-            # Recording rules output
             - -remoteWrite.url=http://monitoring.vmsingle-monitoring-server.svc.cluster.local:8428
 
-            # External URL
             - -external.url=http://vmalert-logs.vector.svc:8880
 
           ports:

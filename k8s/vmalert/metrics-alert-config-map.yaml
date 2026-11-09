@@ -26,15 +26,35 @@ data:
               description: "Сервис {{ $labels.job }} генерирует более 5% ответов 5xx за последние 2 минуты."
               runbook_url: "{{ $externalURL }}/vmalert/alerts?alertname=HighHttpErrorRate"
 
-          - alert: ServiceInstanceDown
-            expr: up{job=~".*your-app-job.*"} == 0
-            for: 30s
+          - alert: BackendProberDown
+            expr: |
+              avg_over_time(
+                probe_success{job="backend-prober"}[5m]
+              ) < 0.5
+            for: 0m
             labels:
               severity: critical
               component: service
+              prober: backend-prober
             annotations:
-              summary: "Инстанс сервиса недоступен"
-              description: "Target {{ $labels.instance }} (job {{ $labels.job }}) не отвечает на scrape-запросы более 30 секунд."
+              summary: "backend-prober недоступен ({{ $labels.instance }})"
+              description: "Менее 50% проб backend-prober за 2 минуты успешны — сервис /api/cars не отвечает (timeout/refused/4xx/5xx)."
+
+          - alert: StockCarOrderProberDown
+            expr: |
+              avg_over_time(
+                probe_success{job="stock-car-order-prober"}[2m]
+              ) < 0.5
+            for: 0m
+            labels:
+              severity: critical
+              component: service
+              prober: stock-car-order-prober
+            annotations:
+              summary: "stock-car-order-prober недоступен ({{ $labels.instance }})"
+              description: "Менее 50% проб stock-car-order-prober за 2 минуты успешны — сервис /api/stockCars не отвечает (timeout/refused/4xx/5xx)."
+              runbook_url: "{{ $externalURL }}/vmalert/alerts?alertname=StockCarOrderProberDown"
+
 
       - name: runtime-actuator-alerts
         type: prometheus
